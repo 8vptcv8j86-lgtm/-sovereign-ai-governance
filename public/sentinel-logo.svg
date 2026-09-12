@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" role="img" aria-labelledby="title">
+  <title id="title">Sentinel</title>
+  <path d="M150 22 258 84v132l-108 62L42 216V84Z" fill="none" stroke="#1769e8" stroke-width="24" stroke-linejoin="round"/>
+  <path d="M211 86h-87l-43 40 43 32h52l43 32-43 36H89" fill="none" stroke="#154f91" stroke-width="25" stroke-linecap="square" stroke-linejoin="round"/>
+  <rect x="137" y="137" width="27" height="27" fill="#efb126"/>
+  <text x="300" y="192" fill="#154f91" font-family="Arial, Helvetica, sans-serif" font-size="112" font-weight="700" letter-spacing="2">SENTINEL</text>
+</svg>
