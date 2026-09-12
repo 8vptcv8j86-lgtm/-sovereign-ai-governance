@@ -1,0 +1,22 @@
+.brand {
+  display: flex;
+  align-items: center;
+  margin: 0 0 28px;
+  padding: 8px 10px;
+  background: #fff;
+  border-radius: 9px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
+}
+
+.brand img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 720px) {
+  .brand {
+    width: 190px;
+    margin: 0;
+  }
+}

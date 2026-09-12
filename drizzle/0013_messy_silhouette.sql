@@ -1,0 +1,31 @@
+CREATE TABLE `public_sector_assessments` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`assessment_code` text NOT NULL,
+	`organization_id` text NOT NULL,
+	`system_code` text NOT NULL,
+	`agency` text NOT NULL,
+	`public_decision` text NOT NULL,
+	`ai_role` text NOT NULL,
+	`legitimate_purpose` text NOT NULL,
+	`less_intrusive_alternative` text NOT NULL,
+	`public_value_measure` text NOT NULL,
+	`due_process` text NOT NULL,
+	`citizen_notice` text NOT NULL,
+	`explanation_procedure` text NOT NULL,
+	`contestability` text NOT NULL,
+	`error_correction` text NOT NULL,
+	`meaningful_human_control` text NOT NULL,
+	`data_quality` text NOT NULL,
+	`distributive_impact` text NOT NULL,
+	`surveillance_necessity` text NOT NULL,
+	`procurement_audit_rights` text NOT NULL,
+	`vendor_exit` text NOT NULL,
+	`generative_ai_controls` text NOT NULL,
+	`readiness_score` integer NOT NULL,
+	`outcome` text NOT NULL,
+	`assessed_by` text NOT NULL,
+	`review_date` text NOT NULL,
+	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `public_sector_assessments_assessment_code_unique` ON `public_sector_assessments` (`assessment_code`);

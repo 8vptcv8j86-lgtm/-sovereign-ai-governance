@@ -1,0 +1,5 @@
+- [x] Add stable authenticated identity and remove shared organization defaults.
+- [x] Centralize tenant-aware actor resolution.
+- [x] Enforce tenant scope in every systems API operation.
+- [x] Generate and validate migrations.
+- [x] Build, test, and audit.

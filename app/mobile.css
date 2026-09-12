@@ -1,0 +1,16 @@
+.mobile-menu-button,.mobile-page-title,.mobile-nav{display:none}
+@media(max-width:720px){
+  .topbar{display:grid;grid-template-columns:auto 1fr auto;gap:10px;background:#fffefa}
+  .mobile-menu-button{display:flex;align-items:center;gap:7px;border:1px solid #cfd5ce;background:#173a31;color:white;border-radius:6px;padding:9px 11px;font-size:11px;font-weight:800}
+  .mobile-menu-button span{font-size:15px;line-height:1}
+  .mobile-page-title{display:block;text-align:center;font:17px Georgia,serif;text-transform:capitalize;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .top-actions{width:auto}.top-actions .search,.top-actions .register-button{display:none}.top-actions .icon-button{display:block}
+  .mobile-nav{display:grid;position:fixed;inset:62px 0 0;z-index:45;background:#102b24;color:white;padding:18px 16px 30px;align-content:start;overflow-y:auto;animation:menuIn .18s ease-out}
+  .mobile-nav-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 15px;color:#9eb1aa;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+  .mobile-nav-head button{border:0;background:none;color:white;font-size:24px}
+  .mobile-nav>button{border:0;border-top:1px solid #29473f;background:transparent;color:#d9e2de;min-height:49px;padding:0 10px;display:flex;align-items:center;gap:13px;text-align:left;font-size:13px}
+  .mobile-nav>button span{width:22px;text-align:center;color:#8fb0a5;font-size:16px}.mobile-nav>button b{margin-left:auto;background:#e76f3c;color:white;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:9px}
+  .mobile-nav>button.active{background:#21473d;color:white;box-shadow:inset 3px 0 #e76f3c}.mobile-nav>button.active span{color:#f39a73}
+  .mobile-nav .mobile-register{margin-top:18px;border:0;background:#e76f3c;color:white;justify-content:center;border-radius:6px;font-weight:800}
+  @keyframes menuIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+}
