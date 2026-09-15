@@ -141,6 +141,13 @@
       "when": 1789154052833,
       "tag": "0019_furry_wolf_cub",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "6",
+      "when": 1789495889447,
+      "tag": "0020_left_mole_man",
+      "breakpoints": true
     }
   ]
 }

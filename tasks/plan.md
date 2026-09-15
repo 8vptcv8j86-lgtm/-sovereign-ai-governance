@@ -1,6 +1,7 @@
-# Multi-tenant organization isolation plan
+# Sovereign resilience implementation plan
 
-1. Bind users to the stable authenticated-user ID and remove the AI-system organization default.
-2. Centralize actor resolution and provision a distinct institution for new signed-in users.
-3. Scope the systems API by the resolved institution.
-4. Generate and validate the migration, then build, test, audit, and deploy.
+1. Add the institution-scoped sovereign-resilience assessment schema and migration.
+2. Add the workspace form, navigation entry, and live assessment table.
+3. Add tenant-scoped reads, server-side validation, deterministic scoring, and audit evidence.
+4. Include assessments in system evidence-package exports.
+5. Add regression coverage and run build, tests, lint, and dependency audit.
