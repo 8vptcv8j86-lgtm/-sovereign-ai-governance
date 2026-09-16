@@ -1,0 +1,6 @@
+- [x] Add sovereign-resilience schema and migration.
+- [x] Add navigation, assessment form, and records table.
+- [x] Add validated tenant-scoped API workflow and deterministic scoring.
+- [x] Include records in evidence-package exports.
+- [x] Add regression tests.
+- [x] Build, test, lint, and audit.
