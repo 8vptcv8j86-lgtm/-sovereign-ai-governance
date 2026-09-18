@@ -243,3 +243,17 @@ Include:
 ## Research basis
 
 Informed by WikiSkill: Compiling Agent Experience into Persistent Knowledge for Skill Evolution, arXiv:2608.27454v1, especially its separation of raw experience, persistent knowledge, and executable skills, and its use of validation gating and rollback before retaining evolved skills.
+
+
+## CI gate
+
+Pull requests must pass the repository workflow in `.github/workflows/ci.yml`.
+
+The workflow:
+1. installs locked dependencies with `npm ci`;
+2. applies every Drizzle SQL migration to a scratch SQLite database and runs `PRAGMA integrity_check`;
+3. runs the Node regression suite;
+4. runs lint;
+5. runs the production build.
+
+Version 30 parity remains a separate prerequisite. The current connected GitHub main does not contain the Version 30 production commit `bfa171c2ceb57b46bc22169ad91ce4fd0ea4d2c3`, so this feature branch must not be merged until the Version 30 source is synced into the repository and the branch is rebased onto it.
