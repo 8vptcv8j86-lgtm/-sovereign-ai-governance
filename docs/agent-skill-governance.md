@@ -257,3 +257,6 @@ The workflow:
 5. runs the production build.
 
 Version 30 parity remains a separate prerequisite. The current connected GitHub main does not contain the Version 30 production commit `bfa171c2ceb57b46bc22169ad91ce4fd0ea4d2c3`, so this feature branch must not be merged until the Version 30 source is synced into the repository and the branch is rebased onto it.
+
+
+CI base gate installed on main so pull requests now inherit the verification workflow.
