@@ -1,0 +1,49 @@
+name: Sentinel CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - feature/agent-skill-governance
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply migrations to scratch SQLite database
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f /tmp/sentinel-ci.db
+          for migration in $(find drizzle -maxdepth 1 -type f -name '*.sql' | sort); do
+            echo "Applying $migration"
+            sed 's/--> statement-breakpoint//g' "$migration" | sqlite3 /tmp/sentinel-ci.db
+          done
+          sqlite3 /tmp/sentinel-ci.db "PRAGMA integrity_check;" | grep -qx "ok"
+
+      - name: Run regression tests
+        run: node --test tests/*.test.mjs
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Production build
+        run: npm run build
