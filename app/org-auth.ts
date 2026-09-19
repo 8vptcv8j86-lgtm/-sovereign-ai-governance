@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "../db";
 import * as s from "../db/schema";
+import { assertKnownRole } from "./api/governance/access";
 
 export type Actor = {
   userId: number;
@@ -42,12 +43,16 @@ async function identityFor(request: Request): Promise<Identity> {
     email ||= "demo@sentinel.local";
   }
   if (!email) throw new Error("AUTH_REQUIRED");
+  if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new Error("AUTH_REQUIRED");
+  }
   // Some authenticated Sites clients do not forward the account ID header.
   // The verified account email is stable and unique, so it is the compatible
   // membership key for those clients.
   authUserId ||= `email:${email}`;
+  if (authUserId.length > 500) throw new Error("AUTH_REQUIRED");
 
-  return { authUserId, email, displayName: fullName || email };
+  return { authUserId, email, displayName: (fullName || email).slice(0, 200) };
 }
 
 async function organizationKey(authUserId: string) {
@@ -64,8 +69,8 @@ async function organizationKey(authUserId: string) {
 export async function actorFor(
   request: Request,
 ): Promise<{ db: Awaited<ReturnType<typeof getDb>>; actor: Actor }> {
-  const db = await getDb();
   const identity = await identityFor(request);
+  const db = await getDb();
   let user = await db
     .select()
     .from(s.users)
@@ -119,6 +124,7 @@ export async function actorFor(
   }
 
   if (!user || user.status !== "active") throw new Error("ACCESS_DENIED");
+  assertKnownRole(user.role);
   const organization = await db
     .select({ name: s.organizations.name })
     .from(s.organizations)
