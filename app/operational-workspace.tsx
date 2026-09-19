@@ -2597,14 +2597,20 @@ export function OperationalWorkspace({
     try {
       const payload = Object.fromEntries(new FormData(form));
       const response = await post({ action: c.action, ...payload });
-      if (c.action === "export_package") {
+      if (
+        c.action === "export_package" ||
+        c.action === "export_skill_evidence_package"
+      ) {
         const blob = new Blob([JSON.stringify(response.result, null, 2)], {
           type: "application/json",
         });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = `sentinel-evidence-${String(payload.systemCode)}.json`;
+        link.download =
+          c.action === "export_skill_evidence_package"
+            ? `sentinel-skill-evidence-${String(payload.skillCode)}.json`
+            : `sentinel-evidence-${String(payload.systemCode)}.json`;
         link.click();
         URL.revokeObjectURL(url);
       }
