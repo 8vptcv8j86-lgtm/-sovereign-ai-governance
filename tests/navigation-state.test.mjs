@@ -6,13 +6,13 @@ test("menu navigation preserves section state and supports browser back", async 
   const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
 
   assert.match(page, /window\.history\.pushState/);
-  assert.match(page, /addEventListener\("popstate",syncFromHistory\)/);
-  assert.match(page, /searchParams\.set\("section",section\)/);
+  assert.match(page, /addEventListener\("popstate",\s*syncFromHistory\)/);
+  assert.match(page, /searchParams\.set\("section",\s*section\)/);
   assert.match(page, /<OperationalWorkspace key=\{active\}/);
   assert.doesNotMatch(page, /onClick=\{\(\)=>setActive\(/);
 
   const workspace = await readFile(new URL("../app/operational-workspace.tsx", import.meta.url), "utf8");
-  assert.match(workspace, /useEffect\(\(\)=>\{void load\(\)\},\[section\]\)/);
+  assert.match(workspace, /useEffect\(\(\)\s*=>\s*\{\s*void load\(\);?\s*\},\s*\[section\]\)/);
   assert.doesNotMatch(workspace, /useEffect\(load,/);
 });
 
