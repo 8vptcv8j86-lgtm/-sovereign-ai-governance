@@ -1,0 +1,296 @@
+{
+  "source_page_id": "3be9a63a-b82c-81c5-a459-edf93313765a",
+  "source_page_title": "Production Source Code — Complete Archive",
+  "recovered_attachment_references": 48,
+  "note": "Internal Notion attachment locators preserved for future attachment resolution. Contents are not inferred from these references.",
+  "attachments": [
+    {
+      "attachment_id": "7999a517-2170-4cd4-b6bc-ec1b7e531b40",
+      "filename": "db__schema.ts.txt",
+      "block_id": "f681a58a-bfb6-444a-81a1-0f25dbe53fe3",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "8bdbfe79-214f-47af-bd9c-68bd4c8c1169",
+      "filename": "db__index.ts.txt",
+      "block_id": "b82f50f9-00b4-4362-8ea4-a4d895457a8b",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "6fb94d65-6ade-4b97-b407-52a74a3c5460",
+      "filename": "drizzle__0000_hesitant_venom.sql.txt",
+      "block_id": "12a745d3-469b-44c7-8df3-220fa503452c",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "d91439b1-b5af-427f-ae8e-573a734dd01e",
+      "filename": "drizzle__0001_parallel_patch.sql.txt",
+      "block_id": "003c75a4-4d67-48bb-a018-5ee105d5470f",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "1a9493c1-266d-42a6-940b-2cfccfd2c48d",
+      "filename": "tests__rendered-html.test.mjs.txt",
+      "block_id": "691cfec9-53b9-453c-811d-8067bf43c7d9",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "4cb466cb-07e0-4f0c-bc0b-d4a098cd05c1",
+      "filename": "README.md.txt",
+      "block_id": "5b60172b-82b9-4e08-9a57-272a6ef149dc",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "c32c5b27-6b93-474b-99fe-fc1cdea9407e",
+      "filename": "app__layout.tsx.txt",
+      "block_id": "77599a34-551e-4dfa-9ec9-91976813da6a",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "bce7b56a-48d6-4962-924c-18e727c934c6",
+      "filename": "app__chatgpt-auth.ts.txt",
+      "block_id": "2bd7a062-2fb5-4a55-b7e0-529b16e2b9e4",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "b33bb021-ebd9-4746-af67-9f83b455afdb",
+      "filename": "drizzle.config.ts.txt",
+      "block_id": "9985b40f-f196-4314-958c-480819a495a4",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "0b6bb218-b09a-42ca-9dcb-9c55402ea8bc",
+      "filename": "vite.config.ts.txt",
+      "block_id": "d7c29dd3-5307-4006-86c1-9fa8adad8f3e",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "fd508eab-413b-41e6-bc84-d13e61331ae3",
+      "filename": "next.config.ts.txt",
+      "block_id": "927ecb0d-22ce-4b94-8bd6-bd2d9390c638",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "50da9542-4d46-4210-a6a9-8293a43e337c",
+      "filename": "tsconfig.json.txt",
+      "block_id": "e243bde6-e2e4-4140-a5bd-4fd4a49ec1af",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "f9c01857-3b4f-4a74-b073-12c9a2575533",
+      "filename": "scripts__build-verified.sh.txt",
+      "block_id": "9b83a8c5-fd2e-4f7b-9817-83a385138c04",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "166195da-cb5f-4c7d-8198-0080aa0c6195",
+      "filename": "scripts__sites-env.sh.txt",
+      "block_id": "02c367d6-0c4b-4347-8f68-6b8c16b16b1c",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "3fd89c45-8f09-4c00-96a8-c7cc1081561e",
+      "filename": "scripts__validate-artifact.sh.txt",
+      "block_id": "b64fe845-fc1a-4977-8fb5-db11f8a8d12d",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "c23c6636-0adf-4a57-a08c-8e92775be1f8",
+      "filename": "db__schema-additions-36-38.ts.txt",
+      "block_id": "11a667d4-538f-4a28-8e75-f042031deaba",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "efc89a7f-3287-4d3b-a3be-7439e3a07ac6",
+      "filename": "app__api__workforce-conduct__route.ts.txt",
+      "block_id": "dc235120-eee5-4615-9fe8-9bb9cc7f1b71",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "adb4bb04-803c-41a7-b2de-3c074d04c4c2",
+      "filename": "app__api__workforce-conduct__id__stage__route.ts.txt",
+      "block_id": "e2f553b9-65ed-44e6-bb47-faf6d41ed165",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "ddc22de8-3ef3-4539-9e35-b924815b57e8",
+      "filename": "app__api__accountability-successions__route.ts.txt",
+      "block_id": "de8fb993-98e8-41b6-bed9-08ed277f7bae",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "469ab78b-bec7-4eda-a17c-08050c5dbb9a",
+      "filename": "app__api__conduct-patterns__route.ts.txt",
+      "block_id": "33472628-2ebc-4bca-b7cd-3d66ad779a80",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "da0bfbd4-eb90-43e6-813b-3983ab5a328c",
+      "filename": "app__api__users__accountable-executive__route.ts.txt",
+      "block_id": "e1644551-5c5c-4f7f-848e-0eeeb7bb2722",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "fc729fd3-4b74-434f-aef0-03cb25a3700e",
+      "filename": "db__schema-additions-36-38-v2.ts.txt",
+      "block_id": "04a06085-17e5-4418-97d0-e715e6706a33",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "c9c1b4cb-4290-45ea-b5b4-ea5b05501c60",
+      "filename": "app__api__workforce-conduct__route-v2.ts.txt",
+      "block_id": "fc90d439-9dca-4b4f-9779-03fa705a358d",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "25f58718-6675-416f-8954-2e9523c47c95",
+      "filename": "app__api__workforce-conduct__id__stage__route-v2.ts.txt",
+      "block_id": "7a951b39-9d3c-40b1-b04e-f88dc7efdcde",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "dc13907a-0288-44ef-8116-708d91f73e41",
+      "filename": "app__api__accountability-successions__route-v2.ts.txt",
+      "block_id": "79c504e6-bea6-4054-8864-66fa16349252",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "378aa2fb-088c-4138-9fe7-79b29e297178",
+      "filename": "app__api__conduct-patterns__route-v2.ts.txt",
+      "block_id": "1e4dee51-fcd1-4f74-a32b-b683ff1e38e0",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "9c73c2f0-6950-4088-8864-13312c4340ce",
+      "filename": "app__api__users__accountable-executive__route-v2.ts.txt",
+      "block_id": "daa044cd-aabf-4cca-9755-165708c4e6b3",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "c359a74a-9b29-45fd-852d-a9e20d2b344d",
+      "filename": "db__schema-additions-36-38-v3.ts.txt",
+      "block_id": "b5f3147f-1f26-4bdd-bb58-5cdd941ff63d",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "ebb2dcb1-68d1-4c22-8760-f9a6335fdf9d",
+      "filename": "app__api__workforce-conduct__route-v3.ts.txt",
+      "block_id": "d0d6e681-ea58-48df-8eef-21e298bd10af",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "07693685-3a60-4fcd-8692-5df7d1627414",
+      "filename": "app__api__workforce-conduct__id__stage__route-v3.ts.txt",
+      "block_id": "f07d73c2-3f44-4dfd-b903-7473679fd6d1",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "b25de191-ff36-4768-a989-be0f0319200e",
+      "filename": "app__api__accountability-successions__route-v3.ts.txt",
+      "block_id": "cdc6fbc0-7f03-47c2-b220-e9118643cb15",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "b39dd165-9f56-4cf3-b9ab-97158bf08c69",
+      "filename": "app__api__conduct-patterns__route-v3.ts.txt",
+      "block_id": "33e6349d-834e-4d9e-8e39-51cc104c624b",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "442fa36c-5586-4c0a-ba57-1fc328752dad",
+      "filename": "app__api__users__accountable-executive__route-v3.ts.txt",
+      "block_id": "768983bf-6043-492b-b81a-514ba39c520c",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "6f0abcd5-0886-42a2-a2ed-22f79d5b9fa3",
+      "filename": "app__api__workforce-conduct__route-v4.ts.txt",
+      "block_id": "9020e934-1118-44c7-9618-0f90a6c12340",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "9c44a87a-f168-441e-94e8-dea4d41be6ef",
+      "filename": "app__api__workforce-conduct__id__stage__route-v4.ts.txt",
+      "block_id": "2ba3d434-27c3-4712-84e8-e45a81a2bc27",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "0efdd584-1ac3-4b91-a717-7c68701b6c8e",
+      "filename": "app__api__accountability-successions__route-v4.ts.txt",
+      "block_id": "211584b6-4de1-4334-9cc5-219653a2d8b3",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "c39b3275-92e7-4076-b677-8e08e1c08109",
+      "filename": "app__api__conduct-patterns__route-v4.ts.txt",
+      "block_id": "6d9cfba0-66b3-4899-b6d5-bf1d14686f1c",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "092dcfec-10b7-498b-9400-cd1d821c510e",
+      "filename": "app__api__users__accountable-executive__route-v4.ts.txt",
+      "block_id": "de1c7dc2-5cfd-4b78-9cf7-20076b115047",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "f7e21690-277c-40a4-bb6a-9338604cd69a",
+      "filename": "db__schema-COMPLETE-MERGED.ts.txt",
+      "block_id": "e9936419-c461-4a56-b1a5-2227e5065675",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "808efb52-c019-4de2-a853-59bf6d3830e9",
+      "filename": "app__api__governance__route-COMPLETE-MERGED.ts.txt",
+      "block_id": "9b1bdcb3-b05e-45e9-94d7-ba3a299495a8",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "4bf7c3ca-876b-4ae8-a415-67bd3b3f3800",
+      "filename": "app__api__governance__route-COMPLETE-MERGED-v2.ts.txt",
+      "block_id": "fc6d8186-df24-4a4e-bf69-b27fbcf1d17c",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "e636d438-869a-4e69-be73-31147889adb7",
+      "filename": "app__api__governance__route-COMPLETE-MERGED-v3.ts.txt",
+      "block_id": "0a2c6725-1c1f-4690-9575-2b7b20790734",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "f4b4c657-dcc6-4e15-b207-e12121504e7c",
+      "filename": "app__api__systems__route-FIXED.ts.txt",
+      "block_id": "31ae2006-8f3a-458e-a7dd-eae6d51efb8f",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "f0c57cd2-729e-4492-9dca-57fcc1ebb632",
+      "filename": "app__api__governance__audit-PATCH-confidential-ip-fix.ts.txt",
+      "block_id": "9a6a7ea4-6ad3-4870-818f-79bda13c0515",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "010dcd8b-ff6f-461c-a05d-0658e7a85742",
+      "filename": "app__operational-workspace-WITH-5-NEW-VIEWS.tsx.txt",
+      "block_id": "28493e7f-bfe4-47b9-8af8-e68a50b872a5",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "ba8933c3-bf22-45a7-b059-d10dfef5e881",
+      "filename": "app__page-WITH-5-NEW-NAV-ENTRIES.tsx.txt",
+      "block_id": "b1763188-b4d0-4ab4-a23e-d4e3f35001df",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "f00615f8-1f48-4874-ad72-8d8a5a31771b",
+      "filename": "tests__system-ownership-scoping-CORRECTED.test.mjs.txt",
+      "block_id": "2e790a53-d904-4fb2-94ae-222f2c1263b6",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    },
+    {
+      "attachment_id": "1f9aea65-417e-486e-af58-882236711fde",
+      "filename": "route-ts-PATCH-recovery-exercise-ordering.txt",
+      "block_id": "0ced407f-1f8b-4ea3-85d6-e54fc840ab68",
+      "space_id": "a609a63a-b82c-81cf-8e9f-000379903823"
+    }
+  ]
+}
