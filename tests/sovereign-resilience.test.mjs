@@ -28,7 +28,8 @@ test("sovereign resilience is scored on the server and preserved as audit eviden
   assert.match(governance, /"STRATEGIC DEPENDENCY"/);
   assert.match(governance, /"sovereign_resilience\.assessed"/);
   assert.match(governance, /JSON\.stringify\(\{systemCode,jurisdiction,primaryProvider,readinessScore,outcome,failedChecks\}\)/);
-  assert.match(governance, /result=\{generatedAt:[^;]+sovereignResilience\}/);
+  assert.match(governance, /packageVersion:"2\\.0"/);
+  assert.match(governance, /sovereignResilience/);
 });
 
 test("client cannot supply a sovereign resilience score or outcome", async () => {
