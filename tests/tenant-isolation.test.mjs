@@ -13,9 +13,10 @@ test("organization scope is derived from authenticated membership", async () => 
   assert.doesNotMatch(schema, /default\("org-sovereign"\)/);
   assert.doesNotMatch(auth, /org-sovereign/);
   assert.match(auth, /oai-authenticated-user-id/);
-  assert.match(auth, /authUserId \|\|= `email:\$\{email\}`/);
-  assert.match(systems, /eq\(aiSystems\.organizationId,actor\.organizationId\)/);
-  assert.match(systems, /organizationId:actor\.organizationId/);
-  assert.match(systems, /AUTH_REQUIRED"\?401/);
+  assert.match(auth, /authUserId: string \| null/);
+  assert.match(auth, /identity\.authUserId \?\? `email:\$\{identity\.email\}`/);
+  assert.doesNotMatch(auth, /authUserId \|\|= `email:/);
+  assert.match(systems, /eq\(aiSystems\.organizationId,\s*actor\.organizationId\)/);
+  assert.match(systems, /organizationId:\s*actor\.organizationId/);
   assert.match(governance, /actorFor, type Actor/);
 });

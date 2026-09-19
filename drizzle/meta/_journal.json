@@ -145,8 +145,36 @@
     {
       "idx": 20,
       "version": "6",
-      "when": 1789495889447,
-      "tag": "0020_left_mole_man",
+      "when": 1789185488980,
+      "tag": "0020_dusty_silhouette",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "6",
+      "when": 1789186325448,
+      "tag": "0021_lying_bastion",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "6",
+      "when": 1789210128072,
+      "tag": "0022_wooden_polaris",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "6",
+      "when": 1789530568621,
+      "tag": "0023_numerous_joshua_kane",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "6",
+      "when": 1789554062347,
+      "tag": "0024_short_zuras",
       "breakpoints": true
     }
   ]
