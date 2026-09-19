@@ -48,3 +48,7 @@ If the original Version 30 tree is later recovered, compare it against this bran
 ## Frozen scope
 
 Do not add Agent Skill Governance to this branch. That work must start from this recovered baseline only after the recovery branch passes CI and independent review.
+
+## CI recovery note
+
+CI normalizes repository shell-script permissions before invoking the production build so verification does not depend on executable-bit preservation in the checkout environment.
