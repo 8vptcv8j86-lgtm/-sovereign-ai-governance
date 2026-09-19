@@ -9,6 +9,7 @@ type View = {
   button?: string;
   fields?: Field[];
   columns: string[];
+  endpoint?: string;
 };
 const views: Record<string, View> = {
   "AI systems": {
@@ -34,6 +35,251 @@ const views: Record<string, View> = {
       f("hostingLocation", "Hosting location"),
     ],
     columns: ["systemCode", "name", "owner", "region", "risk", "status"],
+  },
+  "Skill governance": {
+    key: "dashboard",
+    title: "WikiSkill governance dashboard",
+    intro:
+      "Track governed agent skills from experience evidence through validation, approval, deployment, monitoring and rollback.",
+    endpoint: "/api/skill-governance",
+    columns: [
+      "activeGovernedSkills",
+      "awaitingValidation",
+      "awaitingApproval",
+      "failedValidations",
+      "recentDeployments",
+      "performanceRegressions",
+      "emergencySuspensions",
+      "rollbacks",
+      "overdueReviews",
+    ],
+  },
+  "Agent skills": {
+    key: "skills",
+    title: "Agent skill registry",
+    intro:
+      "Govern reusable agent behavior as a versioned institutional asset with explicit scope, ownership, risk and review deadlines.",
+    endpoint: "/api/skill-governance",
+    action: "register_skill",
+    button: "Register skill",
+    fields: [
+      f("systemCode", "Parent AI system code"),
+      f("agentCode", "Parent agent code"),
+      f("name", "Skill name"),
+      f("purpose", "Purpose", "textarea"),
+      f("riskTier", "Risk tier", "select", ["Low", "Medium", "High", "Critical"]),
+      f("owner", "Accountable owner"),
+      f("approvedScope", "Approved execution scope", "textarea"),
+      f("approvedTools", "Approved tools, comma separated"),
+      f("approvedData", "Approved data classes, comma separated"),
+      f("jurisdictions", "Jurisdictions"),
+      f("reviewDue", "Review due", "date"),
+    ],
+    columns: ["skillCode", "name", "agentCode", "currentVersion", "riskTier", "lifecycleStatus", "reviewDue"],
+  },
+  "Skill provenance": {
+    key: "provenance",
+    title: "Skill experience and knowledge provenance",
+    intro:
+      "Preserve the evidence and operational patterns that justify a behavioral change without exposing unrestricted raw traces to the operating agent.",
+    endpoint: "/api/skill-governance",
+    action: "record_skill_provenance",
+    button: "Record provenance",
+    fields: [
+      f("skillCode", "Skill code"),
+      f("evidenceType", "Evidence type"),
+      f("evidenceReference", "Evidence reference"),
+      f("observationSummary", "Observation summary", "textarea"),
+      f("pattern", "Failure or success pattern", "textarea"),
+      f("sourceExecutionIds", "Source execution IDs"),
+      f("sensitiveDataClassification", "Sensitive data classification"),
+      f("retentionRule", "Retention rule"),
+    ],
+    columns: ["provenanceCode", "skillCode", "evidenceType", "evidenceReference", "recordedBy", "createdAt"],
+  },
+  "Skill proposals": {
+    key: "proposals",
+    title: "Skill change proposals",
+    intro:
+      "Make each proposed behavior change explicit, attributable and reviewable before validation or deployment.",
+    endpoint: "/api/skill-governance",
+    action: "propose_skill_version",
+    button: "Propose skill version",
+    fields: [
+      f("skillCode", "Skill code"),
+      f("version", "Proposed version"),
+      f("content", "Complete skill content", "textarea"),
+      f("sourceType", "Source type", "select", ["human_authored", "agent_evolved", "imported", "policy_change"]),
+      f("changeSummary", "Change summary", "textarea"),
+      f("behavioralDelta", "Behavioral delta", "textarea"),
+      f("changeRationale", "Change rationale", "textarea"),
+      f("provenanceRefs", "Provenance references"),
+      f("expectedBenefit", "Expected benefit", "textarea"),
+      f("knownRisks", "Known risks", "textarea"),
+      f("affectedWorkflows", "Affected workflows"),
+      f("affectedTools", "Affected tools, comma separated"),
+      f("affectedData", "Affected data, comma separated"),
+    ],
+    columns: ["proposalCode", "skillCode", "fromVersion", "proposedVersion", "proposedBy", "status", "createdAt"],
+  },
+  "Skill validation": {
+    key: "validations",
+    title: "Skill validation gate",
+    intro:
+      "Bind a candidate version to a fixed digest and benchmark artifact before acceptance testing begins.",
+    endpoint: "/api/skill-governance",
+    action: "start_skill_validation",
+    button: "Start validation",
+    fields: [
+      f("proposalCode", "Proposal code"),
+      f("testSetReference", "Baseline test set reference"),
+      f("resultArtifact", "Initial validation artifact reference"),
+    ],
+    columns: ["validationCode", "proposalCode", "candidateVersion", "candidateDigest", "outcome", "reviewedBy", "completedAt"],
+  },
+  "Skill validation results": {
+    key: "validations",
+    title: "Complete skill validation",
+    intro:
+      "Compare baseline and candidate performance and block candidates that fail safety, policy, tool scope or data scope checks.",
+    endpoint: "/api/skill-governance",
+    action: "complete_skill_validation",
+    button: "Complete validation",
+    fields: [
+      f("validationCode", "Validation code"),
+      f("baselineScore", "Baseline score", "number"),
+      f("candidateScore", "Candidate score", "number"),
+      f("thresholdDelta", "Minimum required improvement", "number"),
+      f("safetyPass", "Safety regression check", "select", ["Pass", "Fail"]),
+      f("policyPass", "Policy regression check", "select", ["Pass", "Fail"]),
+      f("toolScopePass", "Tool scope check", "select", ["Pass", "Fail"]),
+      f("dataScopePass", "Data scope check", "select", ["Pass", "Fail"]),
+      f("resultArtifact", "Final result artifact reference"),
+    ],
+    columns: ["validationCode", "proposalCode", "baselineScore", "candidateScore", "thresholdDelta", "outcome", "reviewedBy", "completedAt"],
+  },
+  "Skill approvals": {
+    key: "approvals",
+    title: "Independent skill approvals",
+    intro:
+      "Authorize validated changes with independent approval and dual authorization for high risk skills.",
+    endpoint: "/api/skill-governance",
+    action: "approve_skill_change",
+    button: "Approve skill change",
+    fields: [
+      f("proposalCode", "Proposal code"),
+      f("justification", "Approval justification", "textarea"),
+    ],
+    columns: ["approvalCode", "proposalCode", "skillCode", "approverEmail", "outcome", "createdAt"],
+  },
+  "Skill denials": {
+    key: "approvals",
+    title: "Deny a skill change",
+    intro:
+      "Record an explicit independent denial with a retained justification and audit trail.",
+    endpoint: "/api/skill-governance",
+    action: "deny_skill_change",
+    button: "Deny skill change",
+    fields: [
+      f("proposalCode", "Proposal code"),
+      f("justification", "Denial justification", "textarea"),
+    ],
+    columns: ["approvalCode", "proposalCode", "skillCode", "approverEmail", "outcome", "createdAt"],
+  },
+  "Skill deployments": {
+    key: "deployments",
+    title: "Skill deployment ledger",
+    intro:
+      "Deploy only the exact validated and approved digest and retain the prior version as a governed rollback target.",
+    endpoint: "/api/skill-governance",
+    action: "deploy_skill_version",
+    button: "Deploy approved skill",
+    fields: [
+      f("proposalCode", "Approved proposal code"),
+      f("environment", "Environment", "select", ["production", "staging", "pilot"]),
+    ],
+    columns: ["deploymentCode", "skillCode", "approvedVersion", "targetAgent", "environment", "deploymentDigest", "status", "createdAt"],
+  },
+  "Skill performance": {
+    key: "reviews",
+    title: "Post deployment skill performance",
+    intro:
+      "Separate approval from proven operating performance and suspend material regressions or safety breaches.",
+    endpoint: "/api/skill-governance",
+    action: "record_skill_performance_review",
+    button: "Record performance review",
+    fields: [
+      f("skillCode", "Skill code"),
+      f("baselineMetric", "Baseline metric"),
+      f("postDeploymentMetric", "Post deployment metric"),
+      f("evaluationWindow", "Evaluation window"),
+      f("safetyIncidents", "Safety incidents", "number"),
+      f("policyViolations", "Policy violations", "number"),
+      f("humanOverrideRate", "Human override rate"),
+      f("failureRate", "Failure rate"),
+      f("toolErrorRate", "Tool error rate"),
+      f("unexpectedBehavior", "Unexpected behavior", "textarea"),
+      f("conclusion", "Conclusion", "select", ["IMPROVED", "STABLE", "REGRESSION", "SAFETY_BREACH"]),
+      f("nextReview", "Next review", "date"),
+    ],
+    columns: ["reviewCode", "skillCode", "version", "conclusion", "reviewedBy", "nextReview", "createdAt"],
+  },
+  "Skill suspension": {
+    key: "deployments",
+    title: "Emergency skill suspension",
+    intro:
+      "Stop an active skill and its active deployment while preserving the reason in the Version 30 audit chain.",
+    endpoint: "/api/skill-governance",
+    action: "suspend_skill_version",
+    button: "Suspend skill",
+    fields: [
+      f("skillCode", "Skill code"),
+      f("reason", "Suspension reason", "textarea"),
+    ],
+    columns: ["deploymentCode", "skillCode", "approvedVersion", "status", "createdAt"],
+  },
+  "Skill rollbacks": {
+    key: "rollbacks",
+    title: "Governed skill rollback",
+    intro:
+      "Restore a previously validated, approved and deployed version while preserving the trigger and evidence trail.",
+    endpoint: "/api/skill-governance",
+    action: "rollback_skill_version",
+    button: "Rollback skill",
+    fields: [
+      f("skillCode", "Skill code"),
+      f("restoredVersion", "Version to restore"),
+      f("trigger", "Rollback trigger", "textarea"),
+      f("affectedExecutions", "Affected execution references"),
+      f("incidentReference", "Incident reference"),
+      f("evidencePackageReference", "Evidence package reference"),
+    ],
+    columns: ["rollbackCode", "skillCode", "suspendedVersion", "restoredVersion", "authorizedBy", "createdAt"],
+  },
+  "Skill retirement": {
+    key: "skills",
+    title: "Retire a governed skill",
+    intro:
+      "Retire a suspended or inactive skill without deleting its version, provenance, approval or deployment history.",
+    endpoint: "/api/skill-governance",
+    action: "retire_skill",
+    button: "Retire skill",
+    fields: [
+      f("skillCode", "Skill code"),
+      f("reason", "Retirement reason", "textarea"),
+    ],
+    columns: ["skillCode", "name", "currentVersion", "lifecycleStatus", "reviewDue"],
+  },
+  "Skill evidence export": {
+    key: "skills",
+    title: "Skill evidence package",
+    intro:
+      "Generate the skill specific evidence package with lineage, provenance, validation, approvals, deployment, performance, rollback and audit integrity.",
+    endpoint: "/api/skill-governance",
+    action: "export_skill_evidence_package",
+    button: "Generate skill evidence package",
+    fields: [f("skillCode", "Skill code")],
+    columns: ["skillCode", "name", "currentVersion", "lifecycleStatus"],
   },
   "AI agents": {
     key: "agents",
@@ -1885,6 +2131,7 @@ export function OperationalWorkspace({
   flash: (s: string) => void;
 }) {
   const c = views[section] || views["AI systems"];
+  const endpoint = c.endpoint ?? "/api/governance";
   const [data, setData] = useState<Record<string, unknown>>({});
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -1912,7 +2159,7 @@ export function OperationalWorkspace({
   const load = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
     try {
-      const response = await fetch("/api/governance", {
+      const response = await fetch(endpoint, {
         headers: { Accept: "application/json" },
         credentials: "same-origin",
         cache: "no-store",
@@ -1933,7 +2180,7 @@ export function OperationalWorkspace({
     } finally {
       if (!signal?.aborted) setLoading(false);
     }
-  }, []);
+  }, [endpoint]);
   useEffect(() => {
     const controller = new AbortController();
     queueMicrotask(() => void load(controller.signal));
@@ -1948,7 +2195,7 @@ export function OperationalWorkspace({
   const canAct = (action: string | undefined) =>
     Boolean(action && capabilities.includes(action));
   async function post(payload: Record<string, unknown>) {
-    const response = await fetch("/api/governance", {
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
