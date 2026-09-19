@@ -12,7 +12,7 @@ test("menu navigation preserves section state and supports browser back", async 
   assert.doesNotMatch(page, /onClick=\{\(\)=>setActive\(/);
 
   const workspace = await readFile(new URL("../app/operational-workspace.tsx", import.meta.url), "utf8");
-  assert.match(workspace, /useEffect\(\(\)\s*=>\s*\{\s*void load\(\);?\s*\},\s*\[section\]\)/);
+  assert.match(workspace, /useEffect\(\(\)\s*=>\s*\{[\s\S]*AbortController[\s\S]*load\(controller\.signal\)[\s\S]*\},\s*\[load,\s*section\]\)/);
   assert.doesNotMatch(workspace, /useEffect\(load,/);
 });
 
