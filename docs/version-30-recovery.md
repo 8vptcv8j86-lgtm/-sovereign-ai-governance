@@ -1,8 +1,8 @@
-# Sentinel Version 30 Recovery Baseline
+# Sentinel Recovery Baseline — Version 30 Provenance Unverified
 
 ## Status
 
-This branch is a **recovered baseline**, not the original Version 30 git commit.
+This branch is a **Recovery Baseline — Version 30 provenance unverified**. It is not the original Version 30 git commit and does not prove production parity.
 
 Original production record:
 - Version: 30
@@ -52,3 +52,20 @@ Do not add Agent Skill Governance to this branch. That work must start from this
 ## CI recovery note
 
 CI normalizes repository shell-script permissions before invoking the production build so verification does not depend on executable-bit preservation in the checkout environment.
+
+
+## Production behavior comparison gate
+
+Green CI proves buildability and internal regression consistency only. Before this baseline is relied on or merged, compare it against the live production application for audit-chain verification, authorization enforcement, organization scoping, and Evidence Export 2.0 output.
+
+Any divergence must be documented as a baseline difference.
+
+## Independent review expansion
+
+The human review must include recovery-exercise ledger immutability. RPO/RTO evidence is not credible if recovery exercise records can be edited after creation without governed amendment history.
+
+## Required provenance label
+
+Any evidence export, release note, or assurance package from this branch must identify itself as:
+
+**Recovery Baseline — Version 30 provenance unverified**
