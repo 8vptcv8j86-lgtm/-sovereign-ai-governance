@@ -130,7 +130,9 @@ export async function auditedBatch<T>(
   // The production source record requires domain writes and the audit record
   // to execute in one D1 batch. The guard expression is retained in the
   // transaction contract so stale-write protection remains explicit.
-  const guardContract = sql`select case when ${input.guard ?? sql`1 = 1`} then 1 else 0 end`;
+  const guardContract = input.guard
+    ? sql`select case when ${input.guard} then 1 else 0 end`
+    : sql`select 1`;
   void guardContract;
   const auditStatement = await preparedAudit(db, actor, request, input);
   return (db as unknown as { batch(items: unknown[]): Promise<unknown[]> })
