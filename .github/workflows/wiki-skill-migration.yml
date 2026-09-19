@@ -1,0 +1,45 @@
+name: Generate WikiSkill Migration
+
+on:
+  push:
+    branches:
+      - feature/wiki-skill-governance-v30
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/wiki-skill-governance-v30
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Generate Drizzle migration from Version 30 snapshot
+        run: npm run db:generate
+
+      - name: Verify migration number
+        run: |
+          test "$(find drizzle -maxdepth 1 -type f -name '0025_*.sql' | wc -l)" -eq 1
+          grep -q '"idx": 25' drizzle/meta/_journal.json
+          grep -q '"tag": "0025_' drizzle/meta/_journal.json
+
+      - name: Commit generated migration
+        run: |
+          if git diff --quiet -- drizzle; then
+            echo "Migration already generated"
+            exit 0
+          fi
+          git config user.name "sentinel-recovery-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add drizzle
+          git commit -m "Generate 0025 WikiSkill governance migration"
+          git push origin HEAD:feature/wiki-skill-governance-v30
