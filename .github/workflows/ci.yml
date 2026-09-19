@@ -28,6 +28,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Normalize script permissions
+        run: chmod +x scripts/*.sh
+
       - name: Apply migrations to scratch SQLite database
         shell: bash
         run: |
