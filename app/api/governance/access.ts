@@ -75,6 +75,19 @@ export const ACTION_ROLES = {
   ],
   policy: ["admin", "approver"],
   export_package: ["admin", "system_owner", "reviewer", "auditor"],
+  register_skill: ["admin", "system_owner"],
+  record_skill_provenance: ["admin", "system_owner", "reviewer"],
+  propose_skill_version: ["admin", "system_owner"],
+  start_skill_validation: ["admin", "reviewer"],
+  complete_skill_validation: ["admin", "reviewer"],
+  approve_skill_change: ["admin", "approver"],
+  deny_skill_change: ["admin", "approver"],
+  deploy_skill_version: ["admin", "system_owner", "approver"],
+  record_skill_performance_review: ["admin", "reviewer"],
+  suspend_skill_version: ["admin", "approver"],
+  rollback_skill_version: ["admin", "approver"],
+  retire_skill: ["admin", "system_owner"],
+  export_skill_evidence_package: ["admin", "system_owner", "reviewer", "auditor"],
 } satisfies Record<string, readonly Role[]>;
 
 export function assertKnownRole(role: string): asserts role is Role {
