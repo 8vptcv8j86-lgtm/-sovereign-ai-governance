@@ -1,0 +1,67 @@
+{
+  "source": "Notion page 3be9a63a-b82c-81c5-a459-edf93313765a — Production Source Code — Complete Archive",
+  "fetched_at": "2026-09-19",
+  "purpose": "Forensic preservation of exact pasted source blocks. These files are evidence snapshots and are not claimed to be the complete Version 30 tree.",
+  "blocks": [
+    {
+      "heading": "app/page.tsx",
+      "path": "forensics/notion-2026-09-16/app/page.tsx",
+      "length": 23012
+    },
+    {
+      "heading": "app/operational-workspace.tsx",
+      "path": "forensics/notion-2026-09-16/app/operational-workspace.tsx",
+      "length": 46823
+    },
+    {
+      "heading": "app/api/governance/route.ts — CONFIRMED CURRENT, pasted as real text",
+      "path": "forensics/notion-2026-09-16/app/api/governance/route-CONFIRMED-CURRENT.ts",
+      "length": 75845
+    },
+    {
+      "heading": "app/api/systems/route.ts",
+      "path": "forensics/notion-2026-09-16/app/api/systems/route.ts",
+      "length": 1744
+    },
+    {
+      "heading": "app/org-auth.ts",
+      "path": "forensics/notion-2026-09-16/app/org-auth.ts",
+      "length": 4199
+    },
+    {
+      "heading": "app/api/governance/access.ts",
+      "path": "forensics/notion-2026-09-16/app/api/governance/access.ts",
+      "length": 3267
+    },
+    {
+      "heading": "app/api/governance/audit.ts",
+      "path": "forensics/notion-2026-09-16/app/api/governance/audit.ts",
+      "length": 4815
+    },
+    {
+      "heading": "app/api/governance/validation.ts",
+      "path": "forensics/notion-2026-09-16/app/api/governance/validation.ts",
+      "length": 19450
+    },
+    {
+      "heading": "worker/index.ts",
+      "path": "forensics/notion-2026-09-16/worker/index.ts",
+      "length": 3442
+    },
+    {
+      "heading": "db/schema.ts — full contents",
+      "path": "forensics/notion-2026-09-16/db/schema.ts",
+      "length": 25099
+    },
+    {
+      "heading": "app/chatgpt-auth.ts — full contents",
+      "path": "forensics/notion-2026-09-16/app/chatgpt-auth.ts",
+      "length": 2404
+    },
+    {
+      "heading": "app/api/governance/route.ts — visible production source",
+      "path": "forensics/notion-2026-09-16/app/api/governance/route-VISIBLE-PRODUCTION.ts",
+      "length": 57620
+    }
+  ]
+}
