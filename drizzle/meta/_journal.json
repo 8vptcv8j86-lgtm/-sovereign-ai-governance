@@ -148,6 +148,13 @@
       "when": 1789495889447,
       "tag": "0020_left_mole_man",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "6",
+      "when": 1790000000000,
+      "tag": "0021_version30_recovery_assurance",
+      "breakpoints": true
     }
   ]
 }
