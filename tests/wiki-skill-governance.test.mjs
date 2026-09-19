@@ -52,6 +52,13 @@ test("WikiSkill uses Version 30 authentication, authorization, audit, and org sc
   }
 });
 
+test("WikiSkill state changes use the Version 30 atomic audit batch", () => {
+  assert.match(skillRoute, /auditedBatch/);
+  assert.match(skillRoute, /atomicSkillWrite/);
+  assert.doesNotMatch(skillRoute, /await db\.insert/);
+  assert.doesNotMatch(skillRoute, /await db\.update/);
+});
+
 test("skill scope cannot expand beyond the parent agent", () => {
   assert.match(skillRoute, /Skill tools exceed the parent agent's approved tools/);
   assert.match(skillRoute, /Skill data access exceeds the parent agent's approved data/);
