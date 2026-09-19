@@ -33,10 +33,11 @@ test("critical authorization writes are atomic and duplicate approvals are const
 });
 
 test("every authorized governance action is validated and dispatched", async () => {
-  const [access, validation, route] = await Promise.all([
+  const [access, validation, route, skillRoute] = await Promise.all([
     readFile("app/api/governance/access.ts", "utf8"),
     readFile("app/api/governance/validation.ts", "utf8"),
     readFile("app/api/governance/route.ts", "utf8"),
+    readFile("app/api/skill-governance/route.ts", "utf8"),
   ]);
   const roleActions = new Set(
     [...access.matchAll(/^\s{2}([a-z][a-z0-9_]+):\s/gm)].map(
@@ -48,15 +49,42 @@ test("every authorized governance action is validated and dispatched", async () 
       (match) => match[1],
     ),
   );
-  const branches = new Set(
-    [...route.matchAll(/(?:if|else if) \(action === "([a-z0-9_]+)"\)/g)].map(
+  const governanceBranches = new Set(
+    [...route.matchAll(/action\s*===\s*"([a-z0-9_]+)"/g)].map(
       (match) => match[1],
     ),
   );
+  const skillBranches = new Set(
+    [...skillRoute.matchAll(/action\s*===\s*"([a-z0-9_]+)"/g)].map(
+      (match) => match[1],
+    ),
+  );
+  const skillActions = new Set([
+    "register_skill",
+    "record_skill_provenance",
+    "propose_skill_version",
+    "start_skill_validation",
+    "complete_skill_validation",
+    "approve_skill_change",
+    "deny_skill_change",
+    "deploy_skill_version",
+    "record_skill_performance_review",
+    "suspend_skill_version",
+    "rollback_skill_version",
+    "retire_skill",
+    "export_skill_evidence_package",
+  ]);
+  const branches = new Set([...governanceBranches, ...skillBranches]);
 
-  assert.equal(roleActions.size, 53);
+  assert.equal(roleActions.size, 66);
   assert.deepEqual(
-    [...roleActions].filter((action) => !schemas.has(action)),
+    [...roleActions].filter(
+      (action) => !skillActions.has(action) && !schemas.has(action),
+    ),
+    [],
+  );
+  assert.deepEqual(
+    [...skillActions].filter((action) => !skillBranches.has(action)),
     [],
   );
   assert.deepEqual(
@@ -67,6 +95,10 @@ test("every authorized governance action is validated and dispatched", async () 
     [...branches].filter((action) => !roleActions.has(action)),
     [],
   );
+  assert.match(skillRoute, /readJsonObject\(request\)/);
+  assert.match(skillRoute, /textValue\(/);
+  assert.match(skillRoute, /intValue\(/);
+  assert.match(skillRoute, /boolValue\(/);
   assert.match(access, /authorize_agent_action: ownerReview/);
 });
 

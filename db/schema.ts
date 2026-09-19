@@ -826,3 +826,245 @@ export const conductPatternFlags = sqliteTable(
     ),
   ],
 );
+
+
+/* WikiSkill / Agent Skill Governance and Provenance */
+export const skillRegistry = sqliteTable(
+  "skill_registry",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    skillCode: text("skill_code").notNull().unique(),
+    organizationId: text("organization_id").notNull(),
+    systemCode: text("system_code").notNull(),
+    agentCode: text("agent_code").notNull(),
+    name: text("name").notNull(),
+    purpose: text("purpose").notNull(),
+    currentVersion: text("current_version"),
+    lifecycleStatus: text("lifecycle_status").notNull().default("draft"),
+    riskTier: text("risk_tier").notNull().default("Medium"),
+    owner: text("owner").notNull(),
+    approvedScope: text("approved_scope").notNull(),
+    approvedTools: text("approved_tools").notNull(),
+    approvedData: text("approved_data").notNull(),
+    jurisdictions: text("jurisdictions").notNull(),
+    reviewDue: text("review_due").notNull(),
+    createdAt: created(),
+  },
+  (table) => [
+    index("idx_skill_registry_org_status").on(table.organizationId, table.lifecycleStatus),
+    index("idx_skill_registry_org_agent").on(table.organizationId, table.agentCode),
+    index("idx_skill_registry_org_system").on(table.organizationId, table.systemCode),
+  ],
+);
+
+export const skillVersions = sqliteTable(
+  "skill_versions",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    versionCode: text("version_code").notNull().unique(),
+    organizationId: text("organization_id").notNull(),
+    skillCode: text("skill_code").notNull(),
+    version: text("version").notNull(),
+    content: text("content").notNull(),
+    contentDigest: text("content_digest").notNull(),
+    sourceType: text("source_type").notNull(),
+    parentVersion: text("parent_version"),
+    changeSummary: text("change_summary").notNull(),
+    behavioralDelta: text("behavioral_delta").notNull(),
+    proposedBy: text("proposed_by").notNull(),
+    validationStatus: text("validation_status").notNull().default("pending"),
+    approvalStatus: text("approval_status").notNull().default("pending"),
+    deploymentStatus: text("deployment_status").notNull().default("not_deployed"),
+    createdAt: created(),
+  },
+  (table) => [
+    uniqueIndex("uq_skill_versions_org_skill_version").on(
+      table.organizationId,
+      table.skillCode,
+      table.version,
+    ),
+    index("idx_skill_versions_org_digest").on(table.organizationId, table.contentDigest),
+  ],
+);
+
+export const skillProvenance = sqliteTable(
+  "skill_provenance",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    provenanceCode: text("provenance_code").notNull().unique(),
+    organizationId: text("organization_id").notNull(),
+    skillCode: text("skill_code").notNull(),
+    agentCode: text("agent_code").notNull(),
+    evidenceType: text("evidence_type").notNull(),
+    evidenceReference: text("evidence_reference").notNull(),
+    observationSummary: text("observation_summary").notNull(),
+    pattern: text("pattern").notNull(),
+    sourceExecutionIds: text("source_execution_ids").notNull(),
+    sensitiveDataClassification: text("sensitive_data_classification").notNull(),
+    retentionRule: text("retention_rule").notNull(),
+    recordedBy: text("recorded_by").notNull(),
+    createdAt: created(),
+  },
+  (table) => [
+    index("idx_skill_provenance_org_skill").on(table.organizationId, table.skillCode),
+  ],
+);
+
+export const skillChangeProposals = sqliteTable(
+  "skill_change_proposals",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    proposalCode: text("proposal_code").notNull().unique(),
+    organizationId: text("organization_id").notNull(),
+    skillCode: text("skill_code").notNull(),
+    fromVersion: text("from_version"),
+    proposedVersion: text("proposed_version").notNull(),
+    proposedVersionCode: text("proposed_version_code").notNull(),
+    changeRationale: text("change_rationale").notNull(),
+    provenanceRefs: text("provenance_refs").notNull(),
+    expectedBenefit: text("expected_benefit").notNull(),
+    knownRisks: text("known_risks").notNull(),
+    affectedWorkflows: text("affected_workflows").notNull(),
+    affectedTools: text("affected_tools").notNull(),
+    affectedData: text("affected_data").notNull(),
+    rollbackTarget: text("rollback_target"),
+    proposedBy: text("proposed_by").notNull(),
+    status: text("status").notNull().default("proposed"),
+    createdAt: created(),
+  },
+  (table) => [
+    index("idx_skill_change_proposals_org_status").on(table.organizationId, table.status),
+    index("idx_skill_change_proposals_org_skill").on(table.organizationId, table.skillCode),
+  ],
+);
+
+export const skillValidationRuns = sqliteTable(
+  "skill_validation_runs",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    validationCode: text("validation_code").notNull().unique(),
+    organizationId: text("organization_id").notNull(),
+    proposalCode: text("proposal_code").notNull(),
+    skillCode: text("skill_code").notNull(),
+    candidateVersion: text("candidate_version").notNull(),
+    candidateDigest: text("candidate_digest").notNull(),
+    baselineVersion: text("baseline_version"),
+    testSetReference: text("test_set_reference").notNull(),
+    baselineScore: integer("baseline_score").notNull().default(0),
+    candidateScore: integer("candidate_score").notNull().default(0),
+    thresholdDelta: integer("threshold_delta").notNull().default(0),
+    safetyPass: integer("safety_pass", { mode: "boolean" }).notNull().default(false),
+    policyPass: integer("policy_pass", { mode: "boolean" }).notNull().default(false),
+    toolScopePass: integer("tool_scope_pass", { mode: "boolean" }).notNull().default(false),
+    dataScopePass: integer("data_scope_pass", { mode: "boolean" }).notNull().default(false),
+    resultArtifact: text("result_artifact").notNull(),
+    outcome: text("outcome").notNull().default("VALIDATING"),
+    reviewedBy: text("reviewed_by"),
+    createdAt: created(),
+    completedAt: text("completed_at"),
+  },
+  (table) => [
+    index("idx_skill_validation_org_proposal").on(table.organizationId, table.proposalCode),
+  ],
+);
+
+export const skillApprovals = sqliteTable(
+  "skill_approvals",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    approvalCode: text("approval_code").notNull().unique(),
+    organizationId: text("organization_id").notNull(),
+    proposalCode: text("proposal_code").notNull(),
+    skillCode: text("skill_code").notNull(),
+    approverEmail: text("approver_email").notNull(),
+    approverRole: text("approver_role").notNull(),
+    outcome: text("outcome").notNull(),
+    justification: text("justification").notNull(),
+    createdAt: created(),
+  },
+  (table) => [
+    uniqueIndex("uq_skill_approvals_org_proposal_approver").on(
+      table.organizationId,
+      table.proposalCode,
+      table.approverEmail,
+    ),
+    index("idx_skill_approvals_org_proposal").on(table.organizationId, table.proposalCode),
+  ],
+);
+
+export const skillDeployments = sqliteTable(
+  "skill_deployments",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    deploymentCode: text("deployment_code").notNull().unique(),
+    organizationId: text("organization_id").notNull(),
+    skillCode: text("skill_code").notNull(),
+    approvedVersion: text("approved_version").notNull(),
+    targetAgent: text("target_agent").notNull(),
+    targetSystem: text("target_system").notNull(),
+    environment: text("environment").notNull(),
+    deployedBy: text("deployed_by").notNull(),
+    approvalReference: text("approval_reference").notNull(),
+    validationReference: text("validation_reference").notNull(),
+    priorActiveVersion: text("prior_active_version"),
+    rollbackVersion: text("rollback_version"),
+    deploymentDigest: text("deployment_digest").notNull(),
+    status: text("status").notNull().default("active"),
+    createdAt: created(),
+  },
+  (table) => [
+    index("idx_skill_deployments_org_skill_status").on(
+      table.organizationId,
+      table.skillCode,
+      table.status,
+    ),
+  ],
+);
+
+export const skillPerformanceReviews = sqliteTable(
+  "skill_performance_reviews",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    reviewCode: text("review_code").notNull().unique(),
+    organizationId: text("organization_id").notNull(),
+    skillCode: text("skill_code").notNull(),
+    version: text("version").notNull(),
+    baselineMetric: text("baseline_metric").notNull(),
+    postDeploymentMetric: text("post_deployment_metric").notNull(),
+    evaluationWindow: text("evaluation_window").notNull(),
+    safetyIncidents: integer("safety_incidents").notNull().default(0),
+    policyViolations: integer("policy_violations").notNull().default(0),
+    humanOverrideRate: text("human_override_rate").notNull(),
+    failureRate: text("failure_rate").notNull(),
+    toolErrorRate: text("tool_error_rate").notNull(),
+    unexpectedBehavior: text("unexpected_behavior").notNull(),
+    conclusion: text("conclusion").notNull(),
+    reviewedBy: text("reviewed_by").notNull(),
+    nextReview: text("next_review").notNull(),
+    createdAt: created(),
+  },
+  (table) => [
+    index("idx_skill_performance_org_skill").on(table.organizationId, table.skillCode),
+  ],
+);
+
+export const skillRollbacks = sqliteTable(
+  "skill_rollbacks",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    rollbackCode: text("rollback_code").notNull().unique(),
+    organizationId: text("organization_id").notNull(),
+    skillCode: text("skill_code").notNull(),
+    trigger: text("trigger").notNull(),
+    suspendedVersion: text("suspended_version").notNull(),
+    restoredVersion: text("restored_version").notNull(),
+    authorizedBy: text("authorized_by").notNull(),
+    affectedExecutions: text("affected_executions").notNull(),
+    incidentReference: text("incident_reference"),
+    evidencePackageReference: text("evidence_package_reference").notNull(),
+    createdAt: created(),
+  },
+  (table) => [
+    index("idx_skill_rollbacks_org_skill").on(table.organizationId, table.skillCode),
+  ],
+);

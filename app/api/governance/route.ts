@@ -3969,6 +3969,7 @@ export async function POST(request: Request) {
         modelRetirements,
         agents,
         vendorRows,
+        skills,
       ] =
         await Promise.all([
           db
@@ -4102,9 +4103,19 @@ export async function POST(request: Request) {
             .select()
             .from(s.vendorRiskRegister)
             .where(eq(s.vendorRiskRegister.organizationId, org)),
+          db
+            .select()
+            .from(s.skillRegistry)
+            .where(
+              and(
+                eq(s.skillRegistry.organizationId, org),
+                eq(s.skillRegistry.systemCode, code),
+              ),
+            ),
         ]);
       if (!system) throw new Error("AI system not found");
       const agentCodes = agents.map((row) => row.agentCode);
+      const skillCodes = skills.map((row) => row.skillCode);
       const decisionCodes = decisions.map((row) => row.decisionCode);
       const incidentCodes = incidents.map((row) => row.incidentCode);
       const linkedVendors = vendorRows.filter((row) =>
@@ -4160,6 +4171,41 @@ export async function POST(request: Request) {
                 )
             : Promise.resolve([]),
         ]);
+      const [
+        skillVersions,
+        skillProvenance,
+        skillProposals,
+        skillValidations,
+        skillApprovals,
+        skillDeployments,
+        skillPerformanceReviews,
+        skillRollbacks,
+      ] = await Promise.all([
+        skillCodes.length
+          ? db.select().from(s.skillVersions).where(and(eq(s.skillVersions.organizationId, org), inArray(s.skillVersions.skillCode, skillCodes)))
+          : Promise.resolve([]),
+        skillCodes.length
+          ? db.select().from(s.skillProvenance).where(and(eq(s.skillProvenance.organizationId, org), inArray(s.skillProvenance.skillCode, skillCodes)))
+          : Promise.resolve([]),
+        skillCodes.length
+          ? db.select().from(s.skillChangeProposals).where(and(eq(s.skillChangeProposals.organizationId, org), inArray(s.skillChangeProposals.skillCode, skillCodes)))
+          : Promise.resolve([]),
+        skillCodes.length
+          ? db.select().from(s.skillValidationRuns).where(and(eq(s.skillValidationRuns.organizationId, org), inArray(s.skillValidationRuns.skillCode, skillCodes)))
+          : Promise.resolve([]),
+        skillCodes.length
+          ? db.select().from(s.skillApprovals).where(and(eq(s.skillApprovals.organizationId, org), inArray(s.skillApprovals.skillCode, skillCodes)))
+          : Promise.resolve([]),
+        skillCodes.length
+          ? db.select().from(s.skillDeployments).where(and(eq(s.skillDeployments.organizationId, org), inArray(s.skillDeployments.skillCode, skillCodes)))
+          : Promise.resolve([]),
+        skillCodes.length
+          ? db.select().from(s.skillPerformanceReviews).where(and(eq(s.skillPerformanceReviews.organizationId, org), inArray(s.skillPerformanceReviews.skillCode, skillCodes)))
+          : Promise.resolve([]),
+        skillCodes.length
+          ? db.select().from(s.skillRollbacks).where(and(eq(s.skillRollbacks.organizationId, org), inArray(s.skillRollbacks.skillCode, skillCodes)))
+          : Promise.resolve([]),
+      ]);
       const relatedEntityCodes = [
         code,
         ...models.map((row) => String(row.id)),
@@ -4171,6 +4217,7 @@ export async function POST(request: Request) {
         ...deploymentGates.map((row) => row.gateCode),
         ...modelRetirements.map((row) => row.retirementCode),
         ...agents.map((row) => row.agentCode),
+        ...skills.map((row) => row.skillCode),
         ...accessGrants.map((row) => row.grantCode),
         ...correctiveActions.map((row) => row.actionCode),
       ];
@@ -4225,6 +4272,17 @@ export async function POST(request: Request) {
             vendorName: row.vendorName,
             residualRisk: row.residualRisk,
           })),
+        skillGovernance: {
+          suspendedOrRetired: skills
+            .filter((row) => ["suspended", "retired"].includes(row.lifecycleStatus))
+            .map((row) => ({ skillCode: row.skillCode, status: row.lifecycleStatus })),
+          failedValidations: skillValidations
+            .filter((row) => row.outcome === "VALIDATION_FAILED")
+            .map((row) => ({ validationCode: row.validationCode, skillCode: row.skillCode })),
+          pendingApprovals: skillProposals
+            .filter((row) => ["ready_for_approval", "partially_approved"].includes(row.status))
+            .map((row) => ({ proposalCode: row.proposalCode, skillCode: row.skillCode, status: row.status })),
+        },
       };
       result = {
         packageVersion: "2.0",
@@ -4261,6 +4319,17 @@ export async function POST(request: Request) {
         deploymentGates,
         agents,
         accessGrants,
+        skillGovernance: {
+          registry: skills,
+          versions: skillVersions,
+          provenance: skillProvenance,
+          proposals: skillProposals,
+          validations: skillValidations,
+          approvals: skillApprovals,
+          deployments: skillDeployments,
+          performanceReviews: skillPerformanceReviews,
+          rollbacks: skillRollbacks,
+        },
         vendors: linkedVendors,
         publicSectorAssessments,
         africaFirstAssessments,
