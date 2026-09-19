@@ -2,7 +2,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { getDb } from "../../../db";
 import * as s from "../../../db/schema";
 import { actorFor } from "../../org-auth";
-import { assertActionAllowed } from "../governance/access";
+import { assertActionAllowed, capabilitiesFor } from "../governance/access";
 import { audit as governanceAudit, verifyAuditChain } from "../governance/audit";
 import { errorResponse, json, readJsonObject } from "../http";
 
@@ -76,7 +76,7 @@ export async function GET(request:Request){
       rollbacks:rollbacks.length,
       overdueReviews:skills.filter(x=>Date.parse(x.reviewDue)<now).length
     }];
-    return json({actor,skills,versions,provenance,proposals,validations,approvals,deployments,reviews,rollbacks,dashboard});
+    return json({actor,capabilities:capabilitiesFor(actor),skills,versions,provenance,proposals,validations,approvals,deployments,reviews,rollbacks,dashboard});
   }catch(e){return errorResponse(e,"skill-governance")}
 }
 
