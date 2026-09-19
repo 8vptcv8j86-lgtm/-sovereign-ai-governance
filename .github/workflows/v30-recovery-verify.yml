@@ -1,0 +1,53 @@
+name: Version 30 Recovery Verification
+
+on:
+  push:
+    branches:
+      - verification/v30-parent-tree-gap
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Regenerate lockfile from recovered Version 30 package
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+
+      - name: Install exact resolved dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Normalize script permissions
+        run: chmod +x scripts/*.sh
+
+      - name: Apply migrations to scratch SQLite database
+        run: |
+          db="$(mktemp)"
+          for migration in $(find drizzle -maxdepth 1 -type f -name '*.sql' | sort); do
+            sqlite3 "$db" < "$migration"
+          done
+          test "$(sqlite3 "$db" 'PRAGMA integrity_check;')" = "ok"
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Production build
+        run: npm run build
+
+      - name: Run regression tests
+        run: node --test tests/*.test.mjs
+
+      - name: Upload regenerated lockfile
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v30-regenerated-package-lock
+          path: package-lock.json
+          if-no-files-found: error
