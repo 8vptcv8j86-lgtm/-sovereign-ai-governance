@@ -86,6 +86,7 @@ The feature does not maintain a second audit implementation.
 
 ## Enforcement rules
 
+- Atomic domain and audit writes use Sentinel's Version 30 `auditedBatch` path so governed state changes and their audit event commit together.
 - Skill scope cannot exceed the parent AI agent's approved tools or data.
 - Parent agent membership and lifecycle are rechecked at deployment.
 - Candidate content is SHA 256 digested.
