@@ -3,7 +3,7 @@ import { getDb } from "../../../db";
 import * as s from "../../../db/schema";
 import { actorFor } from "../../org-auth";
 import { assertActionAllowed, capabilitiesFor } from "../governance/access";
-import { audit as governanceAudit, verifyAuditChain } from "../governance/audit";
+import { audit as governanceAudit, auditedBatch, verifyAuditChain } from "../governance/audit";
 import { errorResponse, json, readJsonObject } from "../http";
 
 const code=(prefix:string)=>`${prefix}-${Date.now().toString(36).toUpperCase()}${crypto.randomUUID().slice(0,4).toUpperCase()}`;
@@ -13,6 +13,30 @@ const boolValue=(value:unknown)=>value===true||value==="true"||value==="1"||valu
 const csv=(value:unknown)=>String(value??"").split(",").map(x=>x.trim()).filter(Boolean);
 const subset=(child:string[],parent:string[])=>child.every(x=>parent.includes(x));
 async function digest(value:string){const bytes=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(value));return Array.from(new Uint8Array(bytes)).map(b=>b.toString(16).padStart(2,"0")).join("")}
+
+
+async function atomicSkillWrite(
+  db: Awaited<ReturnType<typeof getDb>>,
+  actor: Awaited<ReturnType<typeof actorFor>>["actor"],
+  request: Request,
+  statements: unknown[],
+  action: string,
+  entityCode: string,
+  details: unknown,
+) {
+  return auditedBatch(
+    db,
+    actor,
+    request,
+    statements,
+    {
+      action,
+      entityType: "skill",
+      entityCode,
+      details: typeof details === "string" ? details : JSON.stringify(details),
+    },
+  );
+}
 
 async function auditSkill(
   db: Awaited<ReturnType<typeof getDb>>,
@@ -93,26 +117,32 @@ export async function POST(request:Request){
       if(!subset(approvedTools,csv(agent.approvedTools)))throw new Error("Skill tools exceed the parent agent's approved tools");
       if(!subset(approvedData,csv(agent.approvedData)))throw new Error("Skill data access exceeds the parent agent's approved data");
       const skillCode=code("SKL");
-      const [row]=await db.insert(s.skillRegistry).values({
-        skillCode,organizationId:org,systemCode,agentCode,name:textValue(body.name,"name"),purpose:textValue(body.purpose,"purpose"),
-        riskTier:textValue(body.riskTier,"riskTier"),owner:textValue(body.owner,"owner"),approvedScope:textValue(body.approvedScope,"approvedScope"),
-        approvedTools:approvedTools.join(", "),approvedData:approvedData.join(", "),jurisdictions:textValue(body.jurisdictions,"jurisdictions"),
-        reviewDue:textValue(body.reviewDue,"reviewDue"),lifecycleStatus:"draft"
-      }).returning();
-      result=row;await auditSkill(db,actor,request,"skill.registered","skill",skillCode,{agentCode,systemCode,riskTier:row.riskTier});
+      const riskTier=textValue(body.riskTier,"riskTier");
+      await atomicSkillWrite(db,actor,request,[
+        db.insert(s.skillRegistry).values({
+          skillCode,organizationId:org,systemCode,agentCode,name:textValue(body.name,"name"),purpose:textValue(body.purpose,"purpose"),
+          riskTier,owner:textValue(body.owner,"owner"),approvedScope:textValue(body.approvedScope,"approvedScope"),
+          approvedTools:approvedTools.join(", "),approvedData:approvedData.join(", "),jurisdictions:textValue(body.jurisdictions,"jurisdictions"),
+          reviewDue:textValue(body.reviewDue,"reviewDue"),lifecycleStatus:"draft"
+        })
+      ],"skill.registered",skillCode,{agentCode,systemCode,riskTier});
+      result=await skillFor(db,org,skillCode);
     }
 
     else if(action==="record_skill_provenance"){
       const skillCode=textValue(body.skillCode,"skillCode"),skill=await skillFor(db,org,skillCode);
       const provenanceCode=code("SKP");
-      const [row]=await db.insert(s.skillProvenance).values({
-        provenanceCode,organizationId:org,skillCode,agentCode:skill.agentCode,evidenceType:textValue(body.evidenceType,"evidenceType"),
-        evidenceReference:textValue(body.evidenceReference,"evidenceReference"),observationSummary:textValue(body.observationSummary,"observationSummary"),
-        pattern:textValue(body.pattern,"pattern"),sourceExecutionIds:textValue(body.sourceExecutionIds,"sourceExecutionIds"),
-        sensitiveDataClassification:textValue(body.sensitiveDataClassification,"sensitiveDataClassification"),
-        retentionRule:textValue(body.retentionRule,"retentionRule"),recordedBy:actor.email
-      }).returning();
-      result=row;await auditSkill(db,actor,request,"skill.provenance_recorded","skill",skillCode,{provenanceCode,evidenceType:row.evidenceType});
+      const evidenceType=textValue(body.evidenceType,"evidenceType");
+      await atomicSkillWrite(db,actor,request,[
+        db.insert(s.skillProvenance).values({
+          provenanceCode,organizationId:org,skillCode,agentCode:skill.agentCode,evidenceType,
+          evidenceReference:textValue(body.evidenceReference,"evidenceReference"),observationSummary:textValue(body.observationSummary,"observationSummary"),
+          pattern:textValue(body.pattern,"pattern"),sourceExecutionIds:textValue(body.sourceExecutionIds,"sourceExecutionIds"),
+          sensitiveDataClassification:textValue(body.sensitiveDataClassification,"sensitiveDataClassification"),
+          retentionRule:textValue(body.retentionRule,"retentionRule"),recordedBy:actor.email
+        })
+      ],"skill.provenance_recorded",skillCode,{provenanceCode,evidenceType});
+      result=await db.select().from(s.skillProvenance).where(and(eq(s.skillProvenance.organizationId,org),eq(s.skillProvenance.provenanceCode,provenanceCode))).get();
     }
 
     else if(action==="propose_skill_version"){
@@ -123,22 +153,24 @@ export async function POST(request:Request){
       if(!subset(affectedData,csv(skill.approvedData)))throw new Error("Proposed version expands beyond approved skill data");
       const existing=await db.select().from(s.skillVersions).where(and(eq(s.skillVersions.organizationId,org),eq(s.skillVersions.skillCode,skillCode),eq(s.skillVersions.version,version))).get();
       if(existing)throw new Error("This skill version already exists");
-      const versionCode=code("SKV");
-      await db.insert(s.skillVersions).values({
-        versionCode,organizationId:org,skillCode,version,content,contentDigest,sourceType:textValue(body.sourceType,"sourceType"),
-        parentVersion:skill.currentVersion,changeSummary:textValue(body.changeSummary,"changeSummary"),
-        behavioralDelta:textValue(body.behavioralDelta,"behavioralDelta"),proposedBy:actor.email
-      });
-      const proposalCode=code("SCP");
-      const [proposal]=await db.insert(s.skillChangeProposals).values({
-        proposalCode,organizationId:org,skillCode,fromVersion:skill.currentVersion,proposedVersion:version,proposedVersionCode:versionCode,
-        changeRationale:textValue(body.changeRationale,"changeRationale"),provenanceRefs:textValue(body.provenanceRefs,"provenanceRefs"),
-        expectedBenefit:textValue(body.expectedBenefit,"expectedBenefit"),knownRisks:textValue(body.knownRisks,"knownRisks"),
-        affectedWorkflows:textValue(body.affectedWorkflows,"affectedWorkflows"),affectedTools:affectedTools.join(", "),
-        affectedData:affectedData.join(", "),rollbackTarget:skill.currentVersion,proposedBy:actor.email,status:"proposed"
-      }).returning();
-      await db.update(s.skillRegistry).set({lifecycleStatus:"proposed"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,skillCode)));
-      result={proposal,versionCode,contentDigest};await auditSkill(db,actor,request,"skill.version_proposed","skill",skillCode,{proposalCode,version,contentDigest});
+      const versionCode=code("SKV"),proposalCode=code("SCP");
+      await atomicSkillWrite(db,actor,request,[
+        db.insert(s.skillVersions).values({
+          versionCode,organizationId:org,skillCode,version,content,contentDigest,sourceType:textValue(body.sourceType,"sourceType"),
+          parentVersion:skill.currentVersion,changeSummary:textValue(body.changeSummary,"changeSummary"),
+          behavioralDelta:textValue(body.behavioralDelta,"behavioralDelta"),proposedBy:actor.email
+        }),
+        db.insert(s.skillChangeProposals).values({
+          proposalCode,organizationId:org,skillCode,fromVersion:skill.currentVersion,proposedVersion:version,proposedVersionCode:versionCode,
+          changeRationale:textValue(body.changeRationale,"changeRationale"),provenanceRefs:textValue(body.provenanceRefs,"provenanceRefs"),
+          expectedBenefit:textValue(body.expectedBenefit,"expectedBenefit"),knownRisks:textValue(body.knownRisks,"knownRisks"),
+          affectedWorkflows:textValue(body.affectedWorkflows,"affectedWorkflows"),affectedTools:affectedTools.join(", "),
+          affectedData:affectedData.join(", "),rollbackTarget:skill.currentVersion,proposedBy:actor.email,status:"proposed"
+        }),
+        db.update(s.skillRegistry).set({lifecycleStatus:"proposed"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,skillCode)))
+      ],"skill.version_proposed",skillCode,{proposalCode,version,contentDigest});
+      const proposal=await proposalFor(db,org,proposalCode);
+      result={proposal,versionCode,contentDigest};
     }
 
     else if(action==="start_skill_validation"){
@@ -146,14 +178,16 @@ export async function POST(request:Request){
       if(!["proposed","validation_failed"].includes(proposal.status))throw new Error("Proposal is not eligible for validation");
       const version=await versionFor(db,org,proposal.skillCode,proposal.proposedVersion);
       const validationCode=code("SKT");
-      const [row]=await db.insert(s.skillValidationRuns).values({
-        validationCode,organizationId:org,proposalCode,skillCode:proposal.skillCode,candidateVersion:proposal.proposedVersion,
-        candidateDigest:version.contentDigest,baselineVersion:proposal.fromVersion,testSetReference:textValue(body.testSetReference,"testSetReference"),
-        resultArtifact:textValue(body.resultArtifact,"resultArtifact"),outcome:"VALIDATING"
-      }).returning();
-      await db.update(s.skillChangeProposals).set({status:"validating"}).where(and(eq(s.skillChangeProposals.organizationId,org),eq(s.skillChangeProposals.proposalCode,proposalCode)));
-      await db.update(s.skillVersions).set({validationStatus:"validating"}).where(and(eq(s.skillVersions.organizationId,org),eq(s.skillVersions.versionCode,proposal.proposedVersionCode)));
-      result=row;await auditSkill(db,actor,request,"skill.validation_started","skill",proposal.skillCode,{proposalCode,validationCode,candidateDigest:version.contentDigest});
+      await atomicSkillWrite(db,actor,request,[
+        db.insert(s.skillValidationRuns).values({
+          validationCode,organizationId:org,proposalCode,skillCode:proposal.skillCode,candidateVersion:proposal.proposedVersion,
+          candidateDigest:version.contentDigest,baselineVersion:proposal.fromVersion,testSetReference:textValue(body.testSetReference,"testSetReference"),
+          resultArtifact:textValue(body.resultArtifact,"resultArtifact"),outcome:"VALIDATING"
+        }),
+        db.update(s.skillChangeProposals).set({status:"validating"}).where(and(eq(s.skillChangeProposals.organizationId,org),eq(s.skillChangeProposals.proposalCode,proposalCode))),
+        db.update(s.skillVersions).set({validationStatus:"validating"}).where(and(eq(s.skillVersions.organizationId,org),eq(s.skillVersions.versionCode,proposal.proposedVersionCode)))
+      ],"skill.validation_started",proposal.skillCode,{proposalCode,validationCode,candidateDigest:version.contentDigest});
+      result=await db.select().from(s.skillValidationRuns).where(and(eq(s.skillValidationRuns.organizationId,org),eq(s.skillValidationRuns.validationCode,validationCode))).get();
     }
 
     else if(action==="complete_skill_validation"){
@@ -167,12 +201,15 @@ export async function POST(request:Request){
       const safetyPass=boolValue(body.safetyPass),policyPass=boolValue(body.policyPass),toolScopePass=boolValue(body.toolScopePass),dataScopePass=boolValue(body.dataScopePass);
       const passed=candidateScore-baselineScore>=thresholdDelta&&safetyPass&&policyPass&&toolScopePass&&dataScopePass;
       const outcome=passed?"READY_FOR_APPROVAL":"VALIDATION_FAILED",completedAt=new Date().toISOString();
-      await db.update(s.skillValidationRuns).set({baselineScore,candidateScore,thresholdDelta,safetyPass,policyPass,toolScopePass,dataScopePass,outcome,reviewedBy:actor.email,completedAt,resultArtifact:textValue(body.resultArtifact,"resultArtifact")}).where(and(eq(s.skillValidationRuns.organizationId,org),eq(s.skillValidationRuns.validationCode,validationCode)));
       const proposalStatus=passed?"ready_for_approval":"validation_failed";
-      await db.update(s.skillChangeProposals).set({status:proposalStatus}).where(and(eq(s.skillChangeProposals.organizationId,org),eq(s.skillChangeProposals.proposalCode,validation.proposalCode)));
-      await db.update(s.skillVersions).set({validationStatus:passed?"passed":"failed"}).where(and(eq(s.skillVersions.organizationId,org),eq(s.skillVersions.skillCode,validation.skillCode),eq(s.skillVersions.version,validation.candidateVersion)));
-      await db.update(s.skillRegistry).set({lifecycleStatus:passed?"ready_for_approval":"proposed"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,validation.skillCode)));
-      result={validationCode,outcome,baselineScore,candidateScore,thresholdDelta};await auditSkill(db,actor,request,"skill.validation_completed","skill",validation.skillCode,result);
+      const resultRecord={validationCode,outcome,baselineScore,candidateScore,thresholdDelta};
+      await atomicSkillWrite(db,actor,request,[
+        db.update(s.skillValidationRuns).set({baselineScore,candidateScore,thresholdDelta,safetyPass,policyPass,toolScopePass,dataScopePass,outcome,reviewedBy:actor.email,completedAt,resultArtifact:textValue(body.resultArtifact,"resultArtifact")}).where(and(eq(s.skillValidationRuns.organizationId,org),eq(s.skillValidationRuns.validationCode,validationCode))),
+        db.update(s.skillChangeProposals).set({status:proposalStatus}).where(and(eq(s.skillChangeProposals.organizationId,org),eq(s.skillChangeProposals.proposalCode,validation.proposalCode))),
+        db.update(s.skillVersions).set({validationStatus:passed?"passed":"failed"}).where(and(eq(s.skillVersions.organizationId,org),eq(s.skillVersions.skillCode,validation.skillCode),eq(s.skillVersions.version,validation.candidateVersion))),
+        db.update(s.skillRegistry).set({lifecycleStatus:passed?"ready_for_approval":"proposed"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,validation.skillCode)))
+      ],"skill.validation_completed",validation.skillCode,resultRecord);
+      result=resultRecord;
     }
 
     else if(action==="approve_skill_change"||action==="deny_skill_change"){
@@ -183,24 +220,29 @@ export async function POST(request:Request){
       if(duplicate)throw new Error("This approver has already decided this proposal");
       const outcome=action==="approve_skill_change"?"approved":"denied";
       const approvalCode=code("SKA");
-      await db.insert(s.skillApprovals).values({approvalCode,organizationId:org,proposalCode,skillCode:proposal.skillCode,approverEmail:actor.email,approverRole:actor.role,outcome,justification:textValue(body.justification,"justification")});
+      const justification=textValue(body.justification,"justification");
       if(outcome==="denied"){
-        await db.update(s.skillChangeProposals).set({status:"denied"}).where(and(eq(s.skillChangeProposals.organizationId,org),eq(s.skillChangeProposals.proposalCode,proposalCode)));
-        await db.update(s.skillVersions).set({approvalStatus:"denied"}).where(and(eq(s.skillVersions.organizationId,org),eq(s.skillVersions.versionCode,proposal.proposedVersionCode)));
-        await db.update(s.skillRegistry).set({lifecycleStatus:"proposed"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,proposal.skillCode)));
+        await atomicSkillWrite(db,actor,request,[
+          db.insert(s.skillApprovals).values({approvalCode,organizationId:org,proposalCode,skillCode:proposal.skillCode,approverEmail:actor.email,approverRole:actor.role,outcome,justification}),
+          db.update(s.skillChangeProposals).set({status:"denied"}).where(and(eq(s.skillChangeProposals.organizationId,org),eq(s.skillChangeProposals.proposalCode,proposalCode))),
+          db.update(s.skillVersions).set({approvalStatus:"denied"}).where(and(eq(s.skillVersions.organizationId,org),eq(s.skillVersions.versionCode,proposal.proposedVersionCode))),
+          db.update(s.skillRegistry).set({lifecycleStatus:"proposed"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,proposal.skillCode)))
+        ],"skill.change_denied",proposal.skillCode,{proposalCode,approvalCode,outcome});
         result={proposalCode,status:"denied"};
       }else{
         const skill=await skillFor(db,org,proposal.skillCode);
         const priorApprovals=await db.select().from(s.skillApprovals).where(and(eq(s.skillApprovals.organizationId,org),eq(s.skillApprovals.proposalCode,proposalCode),eq(s.skillApprovals.outcome,"approved")));
         const required=["High","Critical"].includes(skill.riskTier)?2:1;
-        const count=priorApprovals.length;
+        const count=priorApprovals.length+1;
         const status=count>=required?"approved":"partially_approved";
-        await db.update(s.skillChangeProposals).set({status}).where(and(eq(s.skillChangeProposals.organizationId,org),eq(s.skillChangeProposals.proposalCode,proposalCode)));
-        await db.update(s.skillVersions).set({approvalStatus:status==="approved"?"approved":"pending"}).where(and(eq(s.skillVersions.organizationId,org),eq(s.skillVersions.versionCode,proposal.proposedVersionCode)));
-        await db.update(s.skillRegistry).set({lifecycleStatus:status==="approved"?"approved":"ready_for_approval"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,proposal.skillCode)));
+        await atomicSkillWrite(db,actor,request,[
+          db.insert(s.skillApprovals).values({approvalCode,organizationId:org,proposalCode,skillCode:proposal.skillCode,approverEmail:actor.email,approverRole:actor.role,outcome,justification}),
+          db.update(s.skillChangeProposals).set({status}).where(and(eq(s.skillChangeProposals.organizationId,org),eq(s.skillChangeProposals.proposalCode,proposalCode))),
+          db.update(s.skillVersions).set({approvalStatus:status==="approved"?"approved":"pending"}).where(and(eq(s.skillVersions.organizationId,org),eq(s.skillVersions.versionCode,proposal.proposedVersionCode))),
+          db.update(s.skillRegistry).set({lifecycleStatus:status==="approved"?"approved":"ready_for_approval"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,proposal.skillCode)))
+        ],"skill.change_approved",proposal.skillCode,{proposalCode,approvalCode,outcome,status,approvals:count,required});
         result={proposalCode,status,approvals:count,required};
       }
-      await auditSkill(db,actor,request,`skill.change_${outcome}`,"skill",proposal.skillCode,{proposalCode,approvalCode,outcome});
     }
 
     else if(action==="deploy_skill_version"){
@@ -220,16 +262,19 @@ export async function POST(request:Request){
       if(!validation[0]||validation[0].candidateDigest!==version.contentDigest)throw new Error("Passing validation for the exact version digest is required");
       const approvals=await db.select().from(s.skillApprovals).where(and(eq(s.skillApprovals.organizationId,org),eq(s.skillApprovals.proposalCode,proposalCode),eq(s.skillApprovals.outcome,"approved")));
       const required=["High","Critical"].includes(skill.riskTier)?2:1;if(approvals.length<required)throw new Error("Required independent approvals are incomplete");
-      await db.update(s.skillDeployments).set({status:"superseded"}).where(and(eq(s.skillDeployments.organizationId,org),eq(s.skillDeployments.skillCode,skill.skillCode),eq(s.skillDeployments.status,"active")));
       const deploymentCode=code("SKD");
-      const [row]=await db.insert(s.skillDeployments).values({
-        deploymentCode,organizationId:org,skillCode:skill.skillCode,approvedVersion:version.version,targetAgent:skill.agentCode,targetSystem:skill.systemCode,
-        environment:textValue(body.environment,"environment"),deployedBy:actor.email,approvalReference:approvals.map(x=>x.approvalCode).join(", "),
-        validationReference:validation[0].validationCode,priorActiveVersion:skill.currentVersion,rollbackVersion:skill.currentVersion,deploymentDigest:version.contentDigest,status:"active"
-      }).returning();
-      await db.update(s.skillVersions).set({deploymentStatus:"deployed"}).where(and(eq(s.skillVersions.organizationId,org),eq(s.skillVersions.versionCode,version.versionCode)));
-      await db.update(s.skillRegistry).set({currentVersion:version.version,lifecycleStatus:"active"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,skill.skillCode)));
-      result=row;await auditSkill(db,actor,request,"skill.deployed","skill",skill.skillCode,{deploymentCode,version:version.version,digest:version.contentDigest});
+      const environment=textValue(body.environment,"environment");
+      await atomicSkillWrite(db,actor,request,[
+        db.update(s.skillDeployments).set({status:"superseded"}).where(and(eq(s.skillDeployments.organizationId,org),eq(s.skillDeployments.skillCode,skill.skillCode),eq(s.skillDeployments.status,"active"))),
+        db.insert(s.skillDeployments).values({
+          deploymentCode,organizationId:org,skillCode:skill.skillCode,approvedVersion:version.version,targetAgent:skill.agentCode,targetSystem:skill.systemCode,
+          environment,deployedBy:actor.email,approvalReference:approvals.map(x=>x.approvalCode).join(", "),
+          validationReference:validation[0].validationCode,priorActiveVersion:skill.currentVersion,rollbackVersion:skill.currentVersion,deploymentDigest:version.contentDigest,status:"active"
+        }),
+        db.update(s.skillVersions).set({deploymentStatus:"deployed"}).where(and(eq(s.skillVersions.organizationId,org),eq(s.skillVersions.versionCode,version.versionCode))),
+        db.update(s.skillRegistry).set({currentVersion:version.version,lifecycleStatus:"active"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,skill.skillCode)))
+      ],"skill.deployed",skill.skillCode,{deploymentCode,version:version.version,digest:version.contentDigest});
+      result=await db.select().from(s.skillDeployments).where(and(eq(s.skillDeployments.organizationId,org),eq(s.skillDeployments.deploymentCode,deploymentCode))).get();
     }
 
     else if(action==="record_skill_performance_review"){
@@ -238,26 +283,34 @@ export async function POST(request:Request){
       const conclusion=textValue(body.conclusion,"conclusion");
       if(!["STABLE","IMPROVED","REGRESSION","SAFETY_BREACH"].includes(conclusion))throw new Error("Invalid review conclusion");
       const reviewCode=code("SKR");
-      const [row]=await db.insert(s.skillPerformanceReviews).values({
-        reviewCode,organizationId:org,skillCode,version:skill.currentVersion,baselineMetric:textValue(body.baselineMetric,"baselineMetric"),
-        postDeploymentMetric:textValue(body.postDeploymentMetric,"postDeploymentMetric"),evaluationWindow:textValue(body.evaluationWindow,"evaluationWindow"),
-        safetyIncidents:intValue(body.safetyIncidents,"safetyIncidents"),policyViolations:intValue(body.policyViolations,"policyViolations"),
-        humanOverrideRate:textValue(body.humanOverrideRate,"humanOverrideRate"),failureRate:textValue(body.failureRate,"failureRate"),
-        toolErrorRate:textValue(body.toolErrorRate,"toolErrorRate"),unexpectedBehavior:textValue(body.unexpectedBehavior,"unexpectedBehavior"),
-        conclusion,reviewedBy:actor.email,nextReview:textValue(body.nextReview,"nextReview")
-      }).returning();
+      const statements:unknown[]=[
+        db.insert(s.skillPerformanceReviews).values({
+          reviewCode,organizationId:org,skillCode,version:skill.currentVersion,baselineMetric:textValue(body.baselineMetric,"baselineMetric"),
+          postDeploymentMetric:textValue(body.postDeploymentMetric,"postDeploymentMetric"),evaluationWindow:textValue(body.evaluationWindow,"evaluationWindow"),
+          safetyIncidents:intValue(body.safetyIncidents,"safetyIncidents"),policyViolations:intValue(body.policyViolations,"policyViolations"),
+          humanOverrideRate:textValue(body.humanOverrideRate,"humanOverrideRate"),failureRate:textValue(body.failureRate,"failureRate"),
+          toolErrorRate:textValue(body.toolErrorRate,"toolErrorRate"),unexpectedBehavior:textValue(body.unexpectedBehavior,"unexpectedBehavior"),
+          conclusion,reviewedBy:actor.email,nextReview:textValue(body.nextReview,"nextReview")
+        })
+      ];
       if(["REGRESSION","SAFETY_BREACH"].includes(conclusion)){
-        await db.update(s.skillRegistry).set({lifecycleStatus:"suspended"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,skillCode)));
-        await db.update(s.skillDeployments).set({status:"suspended"}).where(and(eq(s.skillDeployments.organizationId,org),eq(s.skillDeployments.skillCode,skillCode),eq(s.skillDeployments.status,"active")));
+        statements.push(
+          db.update(s.skillRegistry).set({lifecycleStatus:"suspended"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,skillCode))),
+          db.update(s.skillDeployments).set({status:"suspended"}).where(and(eq(s.skillDeployments.organizationId,org),eq(s.skillDeployments.skillCode,skillCode),eq(s.skillDeployments.status,"active")))
+        );
       }
-      result=row;await auditSkill(db,actor,request,"skill.performance_reviewed","skill",skillCode,{reviewCode,conclusion});
+      await atomicSkillWrite(db,actor,request,statements,"skill.performance_reviewed",skillCode,{reviewCode,conclusion});
+      result=await db.select().from(s.skillPerformanceReviews).where(and(eq(s.skillPerformanceReviews.organizationId,org),eq(s.skillPerformanceReviews.reviewCode,reviewCode))).get();
     }
 
     else if(action==="suspend_skill_version"){
       const skillCode=textValue(body.skillCode,"skillCode"),skill=await skillFor(db,org,skillCode);
-      await db.update(s.skillRegistry).set({lifecycleStatus:"suspended"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,skillCode)));
-      await db.update(s.skillDeployments).set({status:"suspended"}).where(and(eq(s.skillDeployments.organizationId,org),eq(s.skillDeployments.skillCode,skillCode),eq(s.skillDeployments.status,"active")));
-      result={skillCode,version:skill.currentVersion,status:"suspended"};await auditSkill(db,actor,request,"skill.suspended","skill",skillCode,{version:skill.currentVersion,reason:textValue(body.reason,"reason")});
+      const reason=textValue(body.reason,"reason");
+      await atomicSkillWrite(db,actor,request,[
+        db.update(s.skillRegistry).set({lifecycleStatus:"suspended"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,skillCode))),
+        db.update(s.skillDeployments).set({status:"suspended"}).where(and(eq(s.skillDeployments.organizationId,org),eq(s.skillDeployments.skillCode,skillCode),eq(s.skillDeployments.status,"active")))
+      ],"skill.suspended",skillCode,{version:skill.currentVersion,reason});
+      result={skillCode,version:skill.currentVersion,status:"suspended"};
     }
 
     else if(action==="rollback_skill_version"){
@@ -268,29 +321,33 @@ export async function POST(request:Request){
       if(target.approvalStatus!=="approved"||target.validationStatus!=="passed")throw new Error("Rollback target must be a previously validated and approved version");
       const priorDeployment=await db.select().from(s.skillDeployments).where(and(eq(s.skillDeployments.organizationId,org),eq(s.skillDeployments.skillCode,skillCode),eq(s.skillDeployments.approvedVersion,restoredVersion))).orderBy(desc(s.skillDeployments.id)).limit(1);
       if(!priorDeployment[0])throw new Error("Rollback target has never been deployed");
-      await db.update(s.skillDeployments).set({status:"rolled_back"}).where(and(eq(s.skillDeployments.organizationId,org),eq(s.skillDeployments.skillCode,skillCode),eq(s.skillDeployments.status,"active")));
-      const deploymentCode=code("SKD");
-      await db.insert(s.skillDeployments).values({
-        deploymentCode,organizationId:org,skillCode,approvedVersion:restoredVersion,targetAgent:skill.agentCode,targetSystem:skill.systemCode,
-        environment:priorDeployment[0].environment,deployedBy:actor.email,approvalReference:priorDeployment[0].approvalReference,
-        validationReference:priorDeployment[0].validationReference,priorActiveVersion:skill.currentVersion,rollbackVersion:restoredVersion,
-        deploymentDigest:target.contentDigest,status:"active"
-      });
-      const rollbackCode=code("SKB");
-      const [row]=await db.insert(s.skillRollbacks).values({
-        rollbackCode,organizationId:org,skillCode,trigger:textValue(body.trigger,"trigger"),suspendedVersion:skill.currentVersion,
-        restoredVersion,authorizedBy:actor.email,affectedExecutions:textValue(body.affectedExecutions,"affectedExecutions"),
-        incidentReference:body.incidentReference?String(body.incidentReference):null,evidencePackageReference:textValue(body.evidencePackageReference,"evidencePackageReference")
-      }).returning();
-      await db.update(s.skillRegistry).set({currentVersion:restoredVersion,lifecycleStatus:"active"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,skillCode)));
-      result=row;await auditSkill(db,actor,request,"skill.rolled_back","skill",skillCode,{rollbackCode,from:skill.currentVersion,to:restoredVersion});
+      const deploymentCode=code("SKD"),rollbackCode=code("SKB");
+      await atomicSkillWrite(db,actor,request,[
+        db.update(s.skillDeployments).set({status:"rolled_back"}).where(and(eq(s.skillDeployments.organizationId,org),eq(s.skillDeployments.skillCode,skillCode),eq(s.skillDeployments.status,"active"))),
+        db.insert(s.skillDeployments).values({
+          deploymentCode,organizationId:org,skillCode,approvedVersion:restoredVersion,targetAgent:skill.agentCode,targetSystem:skill.systemCode,
+          environment:priorDeployment[0].environment,deployedBy:actor.email,approvalReference:priorDeployment[0].approvalReference,
+          validationReference:priorDeployment[0].validationReference,priorActiveVersion:skill.currentVersion,rollbackVersion:restoredVersion,
+          deploymentDigest:target.contentDigest,status:"active"
+        }),
+        db.insert(s.skillRollbacks).values({
+          rollbackCode,organizationId:org,skillCode,trigger:textValue(body.trigger,"trigger"),suspendedVersion:skill.currentVersion,
+          restoredVersion,authorizedBy:actor.email,affectedExecutions:textValue(body.affectedExecutions,"affectedExecutions"),
+          incidentReference:body.incidentReference?String(body.incidentReference):null,evidencePackageReference:textValue(body.evidencePackageReference,"evidencePackageReference")
+        }),
+        db.update(s.skillRegistry).set({currentVersion:restoredVersion,lifecycleStatus:"active"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,skillCode)))
+      ],"skill.rolled_back",skillCode,{rollbackCode,from:skill.currentVersion,to:restoredVersion});
+      result=await db.select().from(s.skillRollbacks).where(and(eq(s.skillRollbacks.organizationId,org),eq(s.skillRollbacks.rollbackCode,rollbackCode))).get();
     }
 
     else if(action==="retire_skill"){
       const skillCode=textValue(body.skillCode,"skillCode"),skill=await skillFor(db,org,skillCode);
       if(skill.lifecycleStatus==="active")throw new Error("Suspend the active skill before retirement");
-      await db.update(s.skillRegistry).set({lifecycleStatus:"retired"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,skillCode)));
-      result={skillCode,status:"retired"};await auditSkill(db,actor,request,"skill.retired","skill",skillCode,{reason:textValue(body.reason,"reason")});
+      const reason=textValue(body.reason,"reason");
+      await atomicSkillWrite(db,actor,request,[
+        db.update(s.skillRegistry).set({lifecycleStatus:"retired"}).where(and(eq(s.skillRegistry.organizationId,org),eq(s.skillRegistry.skillCode,skillCode)))
+      ],"skill.retired",skillCode,{reason});
+      result={skillCode,status:"retired"};
     }
 
     else if(action==="export_skill_evidence_package"){
