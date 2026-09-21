@@ -115,7 +115,7 @@ export async function GET(request: Request) {
 
     const advancedRecords = Object.entries(result).flatMap(([entity, rows]) =>
       rows.map((row) => ({
-        ...row,
+        ...(row as Record<string, unknown>),
         entity,
         revision: ADVANCED_GOVERNANCE[entity as AdvancedEntity].revision,
       })),
