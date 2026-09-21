@@ -441,3 +441,47 @@ Core rules introduced:
 - continuous monitoring is not authorized by default
 
 Database implementation remains append-only and must begin with the next generated migration after `0025`.
+
+
+## 2026-09-21 — Supabase-informed R12
+
+Working branch:
+`feature/wiki-skill-governance-supabase-r12`
+
+Preserved predecessor:
+`archive/wiki-skill-governance-capsoftware-r11-2026-09-21`
+
+Parent:
+`0c2b087a851d4747b5c7f8cd5381ac48bae366bd`
+
+Purpose:
+
+Move Sentinel governance enforcement into the data plane so database rows, object storage, realtime channels, secrets and migrations independently enforce institutional boundaries.
+
+R12 adds:
+
+- Data-Plane Policy Registry
+- Row / Record Access Policy Engine
+- Privileged Bypass Identity Registry
+- Realtime / Event-Stream Authorization
+- Governed Object Storage Policy
+- Secrets and Key Reference Registry
+- Security Policy Linter / Advisor
+- Schema and Policy Migration Control
+- reusable data-plane policy template
+
+Core rules introduced:
+
+- sensitive resources default deny
+- application authorization cannot override data-plane denial
+- derived views/reporting cannot widen underlying authority
+- privileged bypass identities are explicit, scoped, time-bounded and audited
+- private realtime channels require authorization
+- object URLs and signed links do not bypass governance policy
+- secret plaintext never enters audit/event payloads
+- security lint findings can block deployment
+- schema and policy changes are reviewed together
+- existing migrations are immutable
+- `0025` remains untouched and next legitimate generated migration is `0026`
+
+Database implementation remains append-only and must begin with the next genuine generated migration after `0025`.
