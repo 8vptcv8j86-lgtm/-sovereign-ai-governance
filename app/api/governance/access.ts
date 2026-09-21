@@ -115,5 +115,5 @@ export function canReadSensitive(actor: Actor) {
 }
 
 export function canReadAudit(actor: Actor) {
-  return ["admin", "auditor", "accountable_executive"].includes(actor.role);
+  return ["admin", "auditor", "accountable_executive"].includes(actor.role as Role);
 }
