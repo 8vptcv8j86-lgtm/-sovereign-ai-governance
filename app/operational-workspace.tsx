@@ -2363,6 +2363,12 @@ const optionalFields = new Set([
   "linkedWhistleblowerReportId",
   "linkedOverrideAuthorizerId",
   "linkedIncidentCode",
+  "subjectCode",
+  "parentCode",
+  "jurisdiction",
+  "payload",
+  "effectiveAt",
+  "expiresAt",
 ]);
 
 type ApiPayload = {
