@@ -110,23 +110,26 @@ export function audit(
   return appendAuditEvent(db, actor, request, { action, entityType, entityCode, details });
 }
 
+type StatementResult<T> = T extends { _: { result: infer R } } ? R : unknown;
+
 export async function auditedWrite<T>(
   db: Db,
   actor: Actor,
   request: Request,
   statement: T,
   input: AuditInput,
-) {
-  return auditedBatch(db, actor, request, [statement], input);
+): Promise<StatementResult<T>> {
+  const [result] = await auditedBatch(db, actor, request, [statement] as const, input);
+  return result as StatementResult<T>;
 }
 
-export async function auditedBatch<T>(
+export async function auditedBatch<const T extends readonly unknown[]>(
   db: Db,
   actor: Actor,
   request: Request,
-  statements: T[],
+  statements: T,
   input: AuditInput,
-) {
+): Promise<{ [K in keyof T]: StatementResult<T[K]> }> {
   // The production source record requires domain writes and the audit record
   // to execute in one D1 batch. The guard expression is retained in the
   // transaction contract so stale-write protection remains explicit.
@@ -137,7 +140,9 @@ export async function auditedBatch<T>(
   const auditStatement = await preparedAudit(db, actor, request, input);
   return (db as unknown as { batch(items: unknown[]): Promise<unknown[]> })
     .batch([...statements, auditStatement])
-    .then((rows) => rows.slice(0, statements.length)) as Promise<T[]>;
+    .then((rows) => rows.slice(0, statements.length)) as Promise<{
+      [K in keyof T]: StatementResult<T[K]>;
+    }>;
 }
 
 export async function verifyAuditChain(db: Db, organizationId: string) {
