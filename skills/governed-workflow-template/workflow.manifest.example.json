@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "workflow_code": "WF-EXAMPLE",
+  "name": "Example Governed Workflow",
+  "version": "1.0.0",
+  "organization_id": "ORG-EXAMPLE",
+  "owner": "owner@example.org",
+  "risk_tier": "Medium",
+  "jurisdictions": [],
+  "workflow_digest_algorithm": "sha256",
+  "steps": [
+    {
+      "sequence": 1,
+      "step_code": "STEP-001",
+      "skill_code": "SKL-EXAMPLE",
+      "skill_version": "1.0.0",
+      "package_hash": null,
+      "agent_code": "AGT-EXAMPLE",
+      "execution_context_code": null,
+      "action_class": "ANALYZE",
+      "required_approval": null,
+      "failure_policy": "stop",
+      "evidence_requirement": "full"
+    }
+  ]
+}
