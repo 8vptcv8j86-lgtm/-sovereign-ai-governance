@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "skill_code": "SKL-EXAMPLE",
+  "name": "Example Governed Skill",
+  "version": "1.0.0",
+  "organization_id": "ORG-EXAMPLE",
+  "system_code": "SYS-EXAMPLE",
+  "agent_code": "AGT-EXAMPLE",
+  "risk_tier": "Medium",
+  "owner": "owner@example.org",
+  "provider_neutral": true,
+  "entrypoint": "SKILL.md",
+  "package_hash_algorithm": "sha256",
+  "approved_tools": [],
+  "approved_data": [],
+  "approved_network_destinations": [],
+  "jurisdictions": [],
+  "validation_reference": null,
+  "approval_references": [],
+  "rollback_version": null
+}
