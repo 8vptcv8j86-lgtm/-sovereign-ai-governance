@@ -485,3 +485,12 @@ Core rules introduced:
 - `0025` remains untouched and next legitimate generated migration is `0026`
 
 Database implementation remains append-only and must begin with the next genuine generated migration after `0025`.
+
+
+### Cross-project engineering adoption
+
+The Supabase-informed R12 data-plane controls are promoted beyond Sentinel into a reusable engineering standard:
+
+`skills/secure-application-engineering/SKILL.md`
+
+This skill applies to future application and code-building work generally, not only Sentinel. It establishes default-deny data-plane enforcement, tenant isolation, operation-specific authorization, privileged-service governance, object/realtime protection, secret-reference discipline, security linting, negative authorization tests, and immutable/generated migration practice as baseline engineering expectations.
