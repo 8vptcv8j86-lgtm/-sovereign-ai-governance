@@ -1068,3 +1068,119 @@ export const skillRollbacks = sqliteTable(
     index("idx_skill_rollbacks_org_skill").on(table.organizationId, table.skillCode),
   ],
 );
+
+
+/* R2–R12 Advanced Governance Runtime */
+const advancedGovernanceLedger = (tableName: string) =>
+  sqliteTable(
+    tableName,
+    {
+      id: integer("id").primaryKey({ autoIncrement: true }),
+      recordCode: text("record_code").notNull().unique(),
+      organizationId: text("organization_id").notNull(),
+      subjectCode: text("subject_code"),
+      parentCode: text("parent_code"),
+      state: text("state").notNull().default("active"),
+      dataLane: text("data_lane").notNull().default("INTERNAL"),
+      jurisdiction: text("jurisdiction"),
+      payload: text("payload", { mode: "json" })
+        .$type<Record<string, unknown>>()
+        .notNull(),
+      contentDigest: text("content_digest").notNull(),
+      createdBy: text("created_by").notNull(),
+      effectiveAt: text("effective_at"),
+      expiresAt: text("expires_at"),
+      createdAt: created(),
+    },
+    (table) => [
+      index(\`idx_\${tableName}_org_state\`).on(table.organizationId, table.state),
+      index(\`idx_\${tableName}_org_subject\`).on(table.organizationId, table.subjectCode),
+    ],
+  );
+
+/* R2 — Governed Workflows & Action Classification */
+export const governedWorkflows = advancedGovernanceLedger("governed_workflows");
+export const governedWorkflowExecutions = advancedGovernanceLedger("governed_workflow_executions");
+export const dataEgressEvents = advancedGovernanceLedger("data_egress_events");
+
+/* R3 — Freshness, Source Health & Data Lanes */
+export const governedSourceRecords = advancedGovernanceLedger("governed_source_records");
+export const executionPreflights = advancedGovernanceLedger("execution_preflights");
+export const dataLanePolicies = advancedGovernanceLedger("data_lane_policies");
+
+/* R4 — Context, Tool Capability, Evaluation & Loop Controls */
+export const governedContextRecords = advancedGovernanceLedger("governed_context_records");
+export const toolCapabilityRegistry = advancedGovernanceLedger("tool_capability_registry");
+export const governanceEvaluationRuns = advancedGovernanceLedger("governance_evaluation_runs");
+export const governedLoopControls = advancedGovernanceLedger("governed_loop_controls");
+
+/* R5 — Checkpoints, Resume, Sandbox & Extensions */
+export const executionCheckpoints = advancedGovernanceLedger("execution_checkpoints");
+export const executionResumeEvents = advancedGovernanceLedger("execution_resume_events");
+export const sandboxPolicyProfiles = advancedGovernanceLedger("sandbox_policy_profiles");
+export const governedExtensions = advancedGovernanceLedger("governed_extensions");
+export const runtimeStateRecords = advancedGovernanceLedger("runtime_state_records");
+
+/* R6 — Governed Human Evidence */
+export const humanEvidenceRequests = advancedGovernanceLedger("human_evidence_requests");
+export const humanEvidenceInteractions = advancedGovernanceLedger("human_evidence_interactions");
+export const humanEvidenceResponses = advancedGovernanceLedger("human_evidence_responses");
+
+/* R7 — Metering-Grade Accountability */
+export const governedUsageEvents = advancedGovernanceLedger("governed_usage_events");
+export const governanceEntitlements = advancedGovernanceLedger("governance_entitlements");
+export const governanceQuotaPolicies = advancedGovernanceLedger("governance_quota_policies");
+export const governanceThresholdEvents = advancedGovernanceLedger("governance_threshold_events");
+export const governanceReconciliations = advancedGovernanceLedger("governance_reconciliations");
+
+/* R8 — Governed Notifications */
+export const governedNotificationWorkflows = advancedGovernanceLedger("governed_notification_workflows");
+export const notificationInstances = advancedGovernanceLedger("notification_instances");
+export const notificationDeliveryAttempts = advancedGovernanceLedger("notification_delivery_attempts");
+export const notificationAcknowledgements = advancedGovernanceLedger("notification_acknowledgements");
+export const notificationEscalations = advancedGovernanceLedger("notification_escalations");
+export const notificationProviderRegistry = advancedGovernanceLedger("notification_provider_registry");
+
+/* R9 — Controlled Evidence Disclosure */
+export const governedEvidenceRooms = advancedGovernanceLedger("governed_evidence_rooms");
+export const evidenceArtifacts = advancedGovernanceLedger("evidence_artifacts");
+export const evidenceArtifactVersions = advancedGovernanceLedger("evidence_artifact_versions");
+export const evidenceDisclosureGrants = advancedGovernanceLedger("evidence_disclosure_grants");
+export const evidenceDisclosureActivities = advancedGovernanceLedger("evidence_disclosure_activities");
+export const evidenceRequestTasks = advancedGovernanceLedger("evidence_request_tasks");
+export const evidenceRoomFreezes = advancedGovernanceLedger("evidence_room_freezes");
+export const evidenceRedactionJobs = advancedGovernanceLedger("evidence_redaction_jobs");
+
+/* R10 — Professional Reliance */
+export const governedMatters = advancedGovernanceLedger("governed_matters");
+export const premiseAssertions = advancedGovernanceLedger("premise_assertions");
+export const sourceProvenanceRecords = advancedGovernanceLedger("source_provenance_records");
+export const artifactRelianceRecords = advancedGovernanceLedger("artifact_reliance_records");
+export const professionalReviewEvents = advancedGovernanceLedger("professional_review_events");
+export const releaseGateDecisions = advancedGovernanceLedger("release_gate_decisions");
+export const sourceSubstitutionEvents = advancedGovernanceLedger("source_substitution_events");
+export const verificationMemoryRecords = advancedGovernanceLedger("verification_memory_records");
+
+/* R11 — Governed Session Capture */
+export const governedCaptureSessions = advancedGovernanceLedger("governed_capture_sessions");
+export const captureScopePolicies = advancedGovernanceLedger("capture_scope_policies");
+export const captureArtifacts = advancedGovernanceLedger("capture_artifacts");
+export const captureEvidenceAnchors = advancedGovernanceLedger("capture_evidence_anchors");
+export const captureStorageProfiles = advancedGovernanceLedger("capture_storage_profiles");
+export const captureProcessingEvents = advancedGovernanceLedger("capture_processing_events");
+export const captureIntegrityChecks = advancedGovernanceLedger("capture_integrity_checks");
+export const captureDeletionEvents = advancedGovernanceLedger("capture_deletion_events");
+
+/* R12 — Data-Plane Governance */
+export const dataPlanePolicies = advancedGovernanceLedger("data_plane_policies");
+export const privilegedBypassIdentities = advancedGovernanceLedger("privileged_bypass_identities");
+export const privilegedBypassEvents = advancedGovernanceLedger("privileged_bypass_events");
+export const realtimeChannelPolicies = advancedGovernanceLedger("realtime_channel_policies");
+export const realtimeSubscriptionEvents = advancedGovernanceLedger("realtime_subscription_events");
+export const objectStoragePolicies = advancedGovernanceLedger("object_storage_policies");
+export const secretReferenceRegistry = advancedGovernanceLedger("secret_reference_registry");
+export const secretRotationEvents = advancedGovernanceLedger("secret_rotation_events");
+export const securityLintRules = advancedGovernanceLedger("security_lint_rules");
+export const securityLintFindings = advancedGovernanceLedger("security_lint_findings");
+export const schemaPolicyMigrationRecords = advancedGovernanceLedger("schema_policy_migration_records");
+export const schemaPolicyVerificationEvents = advancedGovernanceLedger("schema_policy_verification_events");
