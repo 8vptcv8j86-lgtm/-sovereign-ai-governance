@@ -275,3 +275,43 @@ Core rules introduced:
 - reconciliation mismatch creates durable variance evidence and remediation
 
 Database implementation remains append-only and must begin with the next generated migration after `0025`.
+
+
+## 2026-09-21 — Novu-informed R8
+
+Working branch:
+`feature/wiki-skill-governance-novu-r8`
+
+Preserved predecessor:
+`archive/wiki-skill-governance-lago-r7-2026-09-21`
+
+Parent:
+`3350054b9920c736fb8de745b1d1820a9f7b13d6`
+
+Purpose:
+
+Add policy-governed notification delivery, acknowledgement and escalation evidence.
+
+R8 adds:
+
+- Governed Notification Workflow Registry
+- Recipient / Topic Resolution
+- Notification Preference and Criticality Policy
+- Digest, Delay and Throttle Controls
+- Delivery Attempt and Retry Ledger
+- Escalation and Acknowledgement Registry
+- Provider Health and Failover Policy
+- reusable governed notification template
+
+Core rules introduced:
+
+- notification instances bind exact workflow and content/template versions
+- recipient selection reason is preserved
+- criticality is policy-controlled and cannot be elevated by runtime
+- preference overrides require explicit policy basis
+- retries are idempotent
+- delivery and acknowledgement remain distinct states
+- escalation is evidence-driven and time-bound
+- provider failover must respect jurisdiction, privacy and data-lane policy
+
+Database implementation remains append-only and must begin with the next generated migration after `0025`.
