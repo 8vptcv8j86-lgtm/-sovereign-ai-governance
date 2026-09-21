@@ -84,7 +84,6 @@ R2 adds:
 
 Database implementation remains append-only and must begin with the next generated migration after 0025.
 
-
 ## 2026-09-21 — last30days-informed R3
 
 Working branch:
@@ -117,5 +116,46 @@ Core rules introduced:
 - local/sovereign data lanes can prohibit external model/tool processing
 - corroboration is based on independent evidence, not duplicate reference count
 - external integrations consume stable versioned contracts instead of raw database structure
+
+Database implementation remains append-only and must begin with the next generated migration after `0025`.
+
+
+## 2026-09-21 — marketingskills-informed R4
+
+Working branch:
+`feature/wiki-skill-governance-marketingskills-r4`
+
+Preserved predecessor:
+`archive/wiki-skill-governance-last30days-r3-2026-09-21`
+
+Parent:
+`0c41284c9b854b9c7710205bdf6fcfc90155bf01`
+
+Purpose:
+
+Govern coordination across large specialist-skill libraries and recurring autonomous workflows.
+
+R4 adds:
+
+- Shared Governed Context Registry
+- Skill Dependency Graph
+- Invocation / Trigger Policy
+- Loop State and Idempotency Controls
+- Kill-Switch requirements for recurring side-effecting loops
+- Skill Eval Registry
+- Tool Capability Registry
+- operation-level tool authorization
+- reusable governed loop and eval templates
+
+Core rules introduced:
+
+- executions bind the exact version/digest of shared context used
+- skill dependencies cannot widen authority
+- Sentinel records why a skill was invoked
+- recurring side effects require idempotency controls
+- cooldowns and in-flight locks prevent duplicate or overlapping action
+- kill switches are checked before side-effecting loop cycles
+- skill approval can bind to exact eval suite results and package hashes
+- tools are governed at operation/capability level rather than by tool name alone
 
 Database implementation remains append-only and must begin with the next generated migration after `0025`.
