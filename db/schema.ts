@@ -1093,8 +1093,8 @@ const advancedGovernanceLedger = (tableName: string) =>
       createdAt: created(),
     },
     (table) => [
-      index(\`idx_\${tableName}_org_state\`).on(table.organizationId, table.state),
-      index(\`idx_\${tableName}_org_subject\`).on(table.organizationId, table.subjectCode),
+      index(`idx_${tableName}_org_state`).on(table.organizationId, table.state),
+      index(`idx_${tableName}_org_subject`).on(table.organizationId, table.subjectCode),
     ],
   );
 
