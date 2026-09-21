@@ -1070,7 +1070,7 @@ export const skillRollbacks = sqliteTable(
 );
 
 
-/* R2–R12 Advanced Governance Runtime */
+/* R2–R12 Advanced Governance Runtime — migration generation source */
 const advancedGovernanceLedger = (tableName: string) =>
   sqliteTable(
     tableName,
