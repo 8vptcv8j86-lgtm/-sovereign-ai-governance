@@ -88,6 +88,14 @@ export const ACTION_ROLES = {
   rollback_skill_version: ["admin", "approver"],
   retire_skill: ["admin", "system_owner"],
   export_skill_evidence_package: ["admin", "system_owner", "reviewer", "auditor"],
+  create_advanced_record: ["admin", "system_owner", "reviewer"],
+  transition_advanced_record: ["admin", "reviewer", "approver"],
+  export_advanced_governance_package: [
+    "admin",
+    "reviewer",
+    "auditor",
+    "accountable_executive",
+  ],
 } satisfies Record<string, readonly Role[]>;
 
 export function assertKnownRole(role: string): asserts role is Role {
