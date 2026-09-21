@@ -159,3 +159,42 @@ Core rules introduced:
 - tools are governed at operation/capability level rather than by tool name alone
 
 Database implementation remains append-only and must begin with the next generated migration after `0025`.
+
+
+## 2026-09-21 — LangGenius-informed R5
+
+Working branch:
+`feature/wiki-skill-governance-langgenius-r5`
+
+Preserved predecessor:
+`archive/wiki-skill-governance-marketingskills-r4-2026-09-21`
+
+Parent:
+`fd2446e615a3e7eeccc2fc66ab1f879a5a14b14c`
+
+Purpose:
+
+Extend Sentinel governance from configured agents/workflows into live runtime state and execution boundaries.
+
+R5 adds:
+
+- Execution Checkpoint and Resume Registry
+- Node and Edge Governance Policy
+- Sandbox Policy Profiles
+- Governed Extension / Plugin Registry
+- Trace Correlation Registry
+- Governed Runtime State Registry
+- reusable sandbox profile template
+
+Core rules introduced:
+
+- resuming a paused execution is a new authorization event
+- revoked grants or suspended skills/workflows block resume
+- workflow transitions are governed and explainable
+- exact sandbox profile version/digest is bound to execution evidence
+- running extension/plugin digest must match the approved artifact digest
+- governance evidence can correlate to trace/span identifiers without depending on the observability provider
+- runtime state is scoped, classified and retained explicitly
+- runtime state cannot silently become persistent institutional memory
+
+Database implementation remains append-only and must begin with the next generated migration after `0025`.
