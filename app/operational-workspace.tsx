@@ -12,6 +12,155 @@ type View = {
   endpoint?: string;
 };
 const views: Record<string, View> = {
+  "Advanced governance": {
+    key: "advancedRecords",
+    title: "R2–R12 advanced governance runtime",
+    intro:
+      "Create governed workflow, source-health, runtime, human-evidence, metering, notification, disclosure, reliance, capture and data-plane records with organization scope, digest binding and audit evidence.",
+    endpoint: "/api/advanced-governance",
+    action: "create_advanced_record",
+    button: "Create advanced record",
+    fields: [
+      f("entity", "Governance ledger", "select", [
+        "governed_workflows",
+        "governed_workflow_executions",
+        "data_egress_events",
+        "governed_source_records",
+        "execution_preflights",
+        "data_lane_policies",
+        "governed_context_records",
+        "tool_capability_registry",
+        "governance_evaluation_runs",
+        "governed_loop_controls",
+        "execution_checkpoints",
+        "execution_resume_events",
+        "sandbox_policy_profiles",
+        "governed_extensions",
+        "runtime_state_records",
+        "human_evidence_requests",
+        "human_evidence_interactions",
+        "human_evidence_responses",
+        "governed_usage_events",
+        "governance_entitlements",
+        "governance_quota_policies",
+        "governance_threshold_events",
+        "governance_reconciliations",
+        "governed_notification_workflows",
+        "notification_instances",
+        "notification_delivery_attempts",
+        "notification_acknowledgements",
+        "notification_escalations",
+        "notification_provider_registry",
+        "governed_evidence_rooms",
+        "evidence_artifacts",
+        "evidence_artifact_versions",
+        "evidence_disclosure_grants",
+        "evidence_disclosure_activities",
+        "evidence_request_tasks",
+        "evidence_room_freezes",
+        "evidence_redaction_jobs",
+        "governed_matters",
+        "premise_assertions",
+        "source_provenance_records",
+        "artifact_reliance_records",
+        "professional_review_events",
+        "release_gate_decisions",
+        "source_substitution_events",
+        "verification_memory_records",
+        "governed_capture_sessions",
+        "capture_scope_policies",
+        "capture_artifacts",
+        "capture_evidence_anchors",
+        "capture_storage_profiles",
+        "capture_processing_events",
+        "capture_integrity_checks",
+        "capture_deletion_events",
+        "data_plane_policies",
+        "privileged_bypass_identities",
+        "privileged_bypass_events",
+        "realtime_channel_policies",
+        "realtime_subscription_events",
+        "object_storage_policies",
+        "secret_reference_registry",
+        "secret_rotation_events",
+        "security_lint_rules",
+        "security_lint_findings",
+        "schema_policy_migration_records",
+        "schema_policy_verification_events",
+      ]),
+      f("subjectCode", "Subject or governed object code"),
+      f("parentCode", "Parent or lineage code"),
+      f("state", "Initial state"),
+      f("dataLane", "Data lane", "select", [
+        "PUBLIC",
+        "INTERNAL",
+        "CONFIDENTIAL",
+        "RESTRICTED",
+        "LOCAL_ONLY",
+        "SOVEREIGN_ONLY",
+        "REGULATORY_DISCLOSURE",
+      ]),
+      f("jurisdiction", "Jurisdiction"),
+      f("payload", "Policy/evidence payload as JSON", "textarea"),
+      f("effectiveAt", "Effective at", "datetime-local"),
+      f("expiresAt", "Expires at", "datetime-local"),
+    ],
+    columns: [
+      "revision",
+      "entity",
+      "recordCode",
+      "subjectCode",
+      "state",
+      "dataLane",
+      "jurisdiction",
+      "createdBy",
+      "createdAt",
+    ],
+  },
+  "Advanced governance transitions": {
+    key: "advancedRecords",
+    title: "R2–R12 governed state transitions",
+    intro:
+      "Move a governed record through an explicit state change with optimistic concurrency, digest rebinding and an immutable audit event.",
+    endpoint: "/api/advanced-governance",
+    action: "transition_advanced_record",
+    button: "Transition advanced record",
+    fields: [
+      f("entity", "Governance ledger"),
+      f("recordCode", "Record code"),
+      f("expectedState", "Current expected state"),
+      f("nextState", "Next state"),
+      f("payload", "Optional payload amendment as JSON", "textarea"),
+    ],
+    columns: [
+      "revision",
+      "entity",
+      "recordCode",
+      "subjectCode",
+      "state",
+      "contentDigest",
+      "createdAt",
+    ],
+  },
+  "Advanced governance export": {
+    key: "advancedRecords",
+    title: "R2–R12 evidence export",
+    intro:
+      "Generate an institution-scoped, digest-bound evidence package containing the advanced governance runtime records available to the current role.",
+    endpoint: "/api/advanced-governance",
+    action: "export_advanced_governance_package",
+    button: "Export advanced evidence",
+    fields: [],
+    columns: [
+      "revision",
+      "entity",
+      "recordCode",
+      "subjectCode",
+      "state",
+      "dataLane",
+      "createdAt",
+    ],
+  },
   "AI systems": {
     key: "systems",
     title: "AI system register",
@@ -2709,10 +2858,20 @@ export function OperationalWorkspace({
     setError("");
     try {
       const payload = Object.fromEntries(new FormData(form));
+      if (
+        ["create_advanced_record", "transition_advanced_record"].includes(
+          String(c.action),
+        ) &&
+        typeof payload.payload === "string"
+      ) {
+        const raw = payload.payload.trim();
+        payload.payload = raw ? JSON.parse(raw) : {};
+      }
       const response = await post({ action: c.action, ...payload });
       if (
         c.action === "export_package" ||
-        c.action === "export_skill_evidence_package"
+        c.action === "export_skill_evidence_package" ||
+        c.action === "export_advanced_governance_package"
       ) {
         const blob = new Blob([JSON.stringify(response.result, null, 2)], {
           type: "application/json",
@@ -2723,7 +2882,9 @@ export function OperationalWorkspace({
         link.download =
           c.action === "export_skill_evidence_package"
             ? `sentinel-skill-evidence-${String(payload.skillCode)}.json`
-            : `sentinel-evidence-${String(payload.systemCode)}.json`;
+            : c.action === "export_advanced_governance_package"
+              ? "sentinel-r2-r12-governance-evidence.json"
+              : `sentinel-evidence-${String(payload.systemCode)}.json`;
         link.click();
         URL.revokeObjectURL(url);
       }
