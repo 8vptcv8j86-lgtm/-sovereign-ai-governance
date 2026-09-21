@@ -50,9 +50,8 @@ jobs:
           if (!sql.includes(expected)) {
             throw new Error("Latest journal migration is missing: " + expected);
           }
-          if (latest.idx !== 25 || !latest.tag.startsWith("0025_")) {
-            throw new Error(
-              "Expected current migration head to remain 0025 before generated 0026 work",
-            );
+          if (latest.idx !== 26 || !latest.tag.startsWith("0026_")) {
+            throw new Error("Expected generated R2-R12 migration head 0026");
           }
+          JSON.parse(await readFile("drizzle/meta/0026_snapshot.json", "utf8"));
           NODE
