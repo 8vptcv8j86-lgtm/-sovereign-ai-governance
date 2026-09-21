@@ -89,10 +89,15 @@ const nav = [
   "Policies",
   "Audit trail",
   "Users & roles",
+  "User access management",
   "Executive accountability",
   "Workforce conduct",
+  "Workforce conduct progression",
   "Conduct monitoring",
+  "Conduct pattern review",
   "Accountability succession",
+  "Succession reassignment",
+  "Succession overdue scan",
   "Safety guardrails",
   "Terms",
 ] as const;
@@ -232,22 +237,22 @@ export default function Home() {
   }, []);
   async function register(form: HTMLFormElement) {
     const payload = Object.fromEntries(new FormData(form));
-    const response = await fetch("/api/systems", {
+    const response = await fetch("/api/governance", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
       credentials: "same-origin",
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ action: "register_system", ...payload }),
     });
     const contentType = response.headers.get("content-type") ?? "";
     if (!contentType.includes("application/json"))
       throw new Error("The server returned an unexpected response.");
-    const body = (await response.json()) as { system?: Row; error?: string };
-    if (!response.ok || !body.system)
+    const body = (await response.json()) as { result?: Row; error?: string };
+    if (!response.ok || !body.result)
       throw new Error(body.error || "The system could not be registered.");
-    const system = body.system;
+    const system = body.result;
     const record: System = {
       id: String(system.systemCode),
       name: String(system.name),
