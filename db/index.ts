@@ -9,5 +9,6 @@ export async function getDb() {
     );
   }
 
-  return drizzle(env.DB, { schema });
+  const database = env.DB as Parameters<typeof drizzle>[0];
+  return drizzle(database, { schema });
 }

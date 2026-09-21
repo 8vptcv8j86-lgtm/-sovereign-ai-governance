@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - main
-      - feature/agent-skill-governance
+      - "feature/**"
 
 permissions:
   contents: read
@@ -13,8 +13,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,7 +21,7 @@ jobs:
       - name: Use Node 22
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: "22"
           cache: npm
 
       - name: Install dependencies
@@ -42,11 +41,31 @@ jobs:
           done
           sqlite3 /tmp/sentinel-ci.db "PRAGMA integrity_check;" | grep -qx "ok"
 
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Lint
         run: npm run lint
 
-      - name: Production build
-        run: npm run build
+      - name: Test and production build
+        run: npm test
 
-      - name: Run regression tests
-        run: node --test tests/*.test.mjs
+      - name: Verify migration head
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFile, readdir } from "node:fs/promises";
+          const journal = JSON.parse(await readFile("drizzle/meta/_journal.json", "utf8"));
+          const sql = (await readdir("drizzle"))
+            .filter((name) => /^\d{4}_.*\.sql$/.test(name))
+            .sort();
+          const latest = journal.entries.at(-1);
+          if (!latest) throw new Error("Migration journal is empty");
+          const expected = latest.tag + ".sql";
+          if (!sql.includes(expected)) {
+            throw new Error("Latest journal migration is missing: " + expected);
+          }
+          if (latest.idx !== 26 || !latest.tag.startsWith("0026_")) {
+            throw new Error("Expected generated R2-R12 migration head 0026");
+          }
+          JSON.parse(await readFile("drizzle/meta/0026_snapshot.json", "utf8"));
+          NODE
