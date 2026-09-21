@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "skill_code": "SKL-EXAMPLE",
+  "version": "1.0.0",
+  "sources": [],
+  "source_execution_ids": [],
+  "knowledge_extraction_reference": null,
+  "change_rationale": "",
+  "sensitive_data_classification": "",
+  "retention_rule": "",
+  "recorded_by": "",
+  "recorded_at": ""
+}
