@@ -236,3 +236,42 @@ Core rules introduced:
 - identity and device/network metadata are collected only when policy permits
 
 Database implementation remains append-only and must begin with the next generated migration after `0025`.
+
+
+## 2026-09-21 — Lago-informed R7
+
+Working branch:
+`feature/wiki-skill-governance-lago-r7`
+
+Preserved predecessor:
+`archive/wiki-skill-governance-formbricks-r6-2026-09-21`
+
+Parent:
+`a2c8675d3a339825462b7017ac4f57b0a934646e`
+
+Purpose:
+
+Add metering-grade accountability, entitlement consumption, threshold enforcement, atomic governance transitions and independent reconciliation.
+
+R7 adds:
+
+- Governed Usage Event Ledger
+- Agent / Skill Entitlement Registry
+- Quota and Allowance Policies
+- Threshold Alert Engine
+- Atomic Governance Batch Rules
+- Reconciliation and Variance Ledger
+- reusable governed metering template
+
+Core rules introduced:
+
+- usage events are idempotent by transaction identity
+- duplicate events cannot double-count, duplicate alerts or duplicate enforcement
+- permissions and entitlements are evaluated separately
+- quotas and allowances can constrain governed execution
+- threshold crossings are themselves idempotent evidence events
+- configured governance transitions commit atomically or not at all
+- policy-critical results can be independently recomputed
+- reconciliation mismatch creates durable variance evidence and remediation
+
+Database implementation remains append-only and must begin with the next generated migration after `0025`.
