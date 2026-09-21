@@ -27,6 +27,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Normalize script permissions
+        run: chmod +x scripts/*.sh
+
+      - name: Apply migrations to scratch SQLite database
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f /tmp/sentinel-ci.db
+          for migration in $(find drizzle -maxdepth 1 -type f -name '*.sql' | sort); do
+            echo "Applying $migration"
+            sed 's/--> statement-breakpoint//g' "$migration" | sqlite3 /tmp/sentinel-ci.db
+          done
+          sqlite3 /tmp/sentinel-ci.db "PRAGMA integrity_check;" | grep -qx "ok"
+
       - name: Typecheck
         run: npm run typecheck
 
