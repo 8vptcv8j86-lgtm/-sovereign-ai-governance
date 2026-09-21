@@ -3,11 +3,12 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 test("every authorized governance action has backend dispatch and an operator path", async () => {
-  const [access, validation, governance, skill, workspace, page] = await Promise.all([
+  const [access, validation, governance, skill, advanced, workspace, page] = await Promise.all([
     readFile("app/api/governance/access.ts", "utf8"),
     readFile("app/api/governance/validation.ts", "utf8"),
     readFile("app/api/governance/route.ts", "utf8"),
     readFile("app/api/skill-governance/route.ts", "utf8"),
+    readFile("app/api/advanced-governance/route.ts", "utf8"),
     readFile("app/operational-workspace.tsx", "utf8"),
     readFile("app/page.tsx", "utf8"),
   ]);
@@ -21,7 +22,14 @@ test("every authorized governance action has backend dispatch and an operator pa
   const skillBranches = new Set(
     [...skill.matchAll(/action\s*===\s*"([a-z0-9_]+)"/g)].map((m) => m[1]),
   );
-  const backend = new Set([...governanceBranches, ...skillBranches]);
+  const advancedBranches = new Set(
+    [...advanced.matchAll(/action\s*===\s*"([a-z0-9_]+)"/g)].map((m) => m[1]),
+  );
+  const backend = new Set([
+    ...governanceBranches,
+    ...skillBranches,
+    ...advancedBranches,
+  ]);
 
   assert.deepEqual(
     [...authorized].filter((action) => !backend.has(action)),
@@ -66,6 +74,14 @@ test("every authorized governance action has backend dispatch and an operator pa
   }
 
   assert.ok(skillBranches.has("export_skill_evidence_package"));
+  for (const action of [
+    "create_advanced_record",
+    "transition_advanced_record",
+    "export_advanced_governance_package",
+  ]) {
+    assert.ok(advancedBranches.has(action));
+    assert.match(workspace, new RegExp('action: "' + action + '"'));
+  }
 });
 
 test("system registration uses one canonical governance mutation path", async () => {
