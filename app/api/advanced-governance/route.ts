@@ -1,7 +1,7 @@
 import { and, desc, eq } from "drizzle-orm";
 import { actorFor } from "../../org-auth";
 import { errorResponse, json, readJsonObject } from "../http";
-import { assertActionAllowed } from "../governance/access";
+import { assertActionAllowed, capabilitiesFor } from "../governance/access";
 import { auditedWrite } from "../governance/audit";
 import {
   ADVANCED_ENTITIES,
@@ -113,12 +113,22 @@ export async function GET(request: Request) {
         .limit(100);
     }
 
+    const advancedRecords = Object.entries(result).flatMap(([entity, rows]) =>
+      rows.map((row) => ({
+        ...row,
+        entity,
+        revision: ADVANCED_GOVERNANCE[entity as AdvancedEntity].revision,
+      })),
+    );
+
     return json({
       actor: {
         displayName: actor.displayName,
         role: actor.role,
         organizationName: actor.organizationName,
       },
+      capabilities: capabilitiesFor(actor),
+      advancedRecords,
       entities: ADVANCED_ENTITIES.map((entity) => ({
         entity,
         revision: ADVANCED_GOVERNANCE[entity].revision,
