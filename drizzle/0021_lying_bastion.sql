@@ -1,0 +1,1 @@
+ALTER TABLE `guardrail_decisions` ADD `created_by` text DEFAULT 'legacy-system' NOT NULL;
