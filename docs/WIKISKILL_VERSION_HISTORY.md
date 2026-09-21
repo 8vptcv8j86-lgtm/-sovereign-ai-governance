@@ -315,3 +315,44 @@ Core rules introduced:
 - provider failover must respect jurisdiction, privacy and data-lane policy
 
 Database implementation remains append-only and must begin with the next generated migration after `0025`.
+
+
+## 2026-09-21 — Papermark-informed R9
+
+Working branch:
+`feature/wiki-skill-governance-papermark-r9`
+
+Preserved predecessor:
+`archive/wiki-skill-governance-novu-r8-2026-09-21`
+
+Parent:
+`1f1f5c70017e1b9d6cffc6d056b45a12493dc850`
+
+Purpose:
+
+Add controlled evidence disclosure, examination rooms, scoped disclosure permissions, evidence-request tasks, integrity sealing and governed redaction.
+
+R9 adds:
+
+- Governed Evidence Room Registry
+- Evidence Disclosure Access Grants
+- Evidence Package / Document Version Registry
+- Disclosure Activity Ledger
+- Evidence Request & Submission Tasks
+- Evidence Room Freeze & Integrity Seal
+- Governed Redaction Pipeline
+- reusable evidence-room template
+
+Core rules introduced:
+
+- internal evidence possession and external evidence disclosure are separate control planes
+- evidence-room creation does not imply source-record access
+- disclosure permissions distinguish view, derivative/redacted download and original download
+- every disclosure binds exact artifact version and digest
+- redaction creates a new derivative version rather than overwriting source evidence
+- room activity distinguishes invitation, view, download and blocked access
+- submitted evidence is not accepted evidence until separately reviewed
+- a frozen evidence room produces a verifiable manifest/integrity seal
+- post-freeze changes require a supplemental disclosure or new room version
+
+Database implementation remains append-only and must begin with the next generated migration after `0025`.
