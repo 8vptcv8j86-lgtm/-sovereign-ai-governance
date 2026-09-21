@@ -83,3 +83,39 @@ R2 adds:
 - design for tamper-evident outbound data-transfer evidence
 
 Database implementation remains append-only and must begin with the next generated migration after 0025.
+
+
+## 2026-09-21 — last30days-informed R3
+
+Working branch:
+`feature/wiki-skill-governance-last30days-r3`
+
+Preserved predecessor:
+`archive/wiki-skill-governance-gstack-r2-2026-09-21`
+
+Parent:
+`ca007d0bbc434b60545d41118533faba037f635b`
+
+Purpose:
+
+Strengthen the Sentinel evidence plane and pre-execution control model.
+
+R3 adds:
+
+- Evidence Freshness
+- Evidence Source Health
+- Execution Preflight
+- Sovereign / Local Data Lanes
+- Evidence Clustering
+- Stable Versioned Machine Contracts
+
+Core rules introduced:
+
+- stale or contradicted evidence can no longer silently satisfy time-sensitive controls
+- configured evidence sources are distinguished from verified-working sources
+- side-effecting execution can be bound to an approved preflight plan digest
+- local/sovereign data lanes can prohibit external model/tool processing
+- corroboration is based on independent evidence, not duplicate reference count
+- external integrations consume stable versioned contracts instead of raw database structure
+
+Database implementation remains append-only and must begin with the next generated migration after `0025`.
