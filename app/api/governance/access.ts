@@ -99,18 +99,18 @@ export function assertActionAllowed(actor: Actor, action: string) {
     action as keyof typeof ACTION_ROLES
   ] as readonly Role[] | undefined;
   if (!roles) throw new ApiError("UNKNOWN_ACTION", "Unknown action", 400);
-  if (!roles.includes(actor.role)) throw new Error("ACCESS_DENIED");
+  if (!roles.includes(actor.role as Role)) throw new Error("ACCESS_DENIED");
 }
 
 export function capabilitiesFor(actor: Actor) {
   return Object.entries(ACTION_ROLES)
-    .filter(([, roles]) => (roles as readonly Role[]).includes(actor.role))
+    .filter(([, roles]) => (roles as readonly Role[]).includes(actor.role as Role))
     .map(([action]) => action);
 }
 
 export function canReadSensitive(actor: Actor) {
   return ["admin", "reviewer", "auditor", "accountable_executive"].includes(
-    actor.role,
+    actor.role as Role,
   );
 }
 
