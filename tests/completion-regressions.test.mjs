@@ -33,11 +33,12 @@ test("critical authorization writes are atomic and duplicate approvals are const
 });
 
 test("every authorized governance action is validated and dispatched", async () => {
-  const [access, validation, route, skillRoute] = await Promise.all([
+  const [access, validation, route, skillRoute, advancedRoute] = await Promise.all([
     readFile("app/api/governance/access.ts", "utf8"),
     readFile("app/api/governance/validation.ts", "utf8"),
     readFile("app/api/governance/route.ts", "utf8"),
     readFile("app/api/skill-governance/route.ts", "utf8"),
+    readFile("app/api/advanced-governance/route.ts", "utf8"),
   ]);
   const roleActions = new Set(
     [...access.matchAll(/^\s{2}([a-z][a-z0-9_]+):\s/gm)].map(
@@ -74,17 +75,38 @@ test("every authorized governance action is validated and dispatched", async () 
     "retire_skill",
     "export_skill_evidence_package",
   ]);
-  const branches = new Set([...governanceBranches, ...skillBranches]);
+  const advancedBranches = new Set(
+    [...advancedRoute.matchAll(/action\s*===\s*"([a-z0-9_]+)"/g)].map(
+      (match) => match[1],
+    ),
+  );
+  const advancedActions = new Set([
+    "create_advanced_record",
+    "transition_advanced_record",
+    "export_advanced_governance_package",
+  ]);
+  const branches = new Set([
+    ...governanceBranches,
+    ...skillBranches,
+    ...advancedBranches,
+  ]);
 
-  assert.equal(roleActions.size, 66);
+  assert.equal(roleActions.size, 69);
   assert.deepEqual(
     [...roleActions].filter(
-      (action) => !skillActions.has(action) && !schemas.has(action),
+      (action) =>
+        !skillActions.has(action) &&
+        !advancedActions.has(action) &&
+        !schemas.has(action),
     ),
     [],
   );
   assert.deepEqual(
     [...skillActions].filter((action) => !skillBranches.has(action)),
+    [],
+  );
+  assert.deepEqual(
+    [...advancedActions].filter((action) => !advancedBranches.has(action)),
     [],
   );
   assert.deepEqual(
