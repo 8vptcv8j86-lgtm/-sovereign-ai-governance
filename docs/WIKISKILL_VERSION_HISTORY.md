@@ -198,3 +198,41 @@ Core rules introduced:
 - runtime state cannot silently become persistent institutional memory
 
 Database implementation remains append-only and must begin with the next generated migration after `0025`.
+
+
+## 2026-09-21 — Formbricks-informed R6
+
+Working branch:
+`feature/wiki-skill-governance-formbricks-r6`
+
+Preserved predecessor:
+`archive/wiki-skill-governance-langgenius-r5-2026-09-21`
+
+Parent:
+`d096b5911025c5ab2edfc029ac2efe9ca67502c4`
+
+Purpose:
+
+Add governed human evidence capture to the Sentinel control and evidence chain.
+
+R6 adds:
+
+- Governed Human Evidence Requests
+- Eligibility and Targeting Rules
+- Human Response / Attestation Ledger
+- Interaction State Tracking
+- Response-Driven Governance Actions
+- Evidence Collection Privacy Policy
+- reusable human-attestation template
+
+Core rules introduced:
+
+- responses bind the exact request-template version and presented-content digest
+- eligibility and trigger decisions are separately recorded
+- delivery/seen/started/completed/declined/expired states are distinct
+- original attestations are immutable; corrections are amendments
+- human responses may trigger governance actions but do not bypass authorization
+- evidence collection is purpose-bound and privacy-policy controlled
+- identity and device/network metadata are collected only when policy permits
+
+Database implementation remains append-only and must begin with the next generated migration after `0025`.
