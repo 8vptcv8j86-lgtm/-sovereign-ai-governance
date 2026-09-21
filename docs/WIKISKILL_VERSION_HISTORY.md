@@ -356,3 +356,45 @@ Core rules introduced:
 - post-freeze changes require a supplemental disclosure or new room version
 
 Database implementation remains append-only and must begin with the next generated migration after `0025`.
+
+
+## 2026-09-21 — Claude for Legal-informed R10
+
+Working branch:
+`feature/wiki-skill-governance-claude-legal-r10`
+
+Preserved predecessor:
+`archive/wiki-skill-governance-papermark-r9-2026-09-21`
+
+Parent:
+`d407e64da598d6ebba7dc6a7623501659a70ca28`
+
+Purpose:
+
+Add professional-reliance governance so generated analysis, verified information, professional review and authorized external reliance remain distinct states.
+
+R10 adds:
+
+- Governed Matter / Case Workspace Registry
+- Premise and Assertion Verification Ledger
+- Source Provenance Classification
+- Reliance Classification Registry
+- Professional Review and Verification Ledger
+- Destination / Confidentiality Release Gate
+- Authoritative Source Substitution Policy
+- Verification Memory
+- reusable professional-reliance template
+
+Core rules introduced:
+
+- matter-local context is default-deny outside the active matter
+- policy-critical premises cannot silently become established fact
+- provenance labels must reflect actual retrieval
+- model knowledge cannot masquerade as authoritative retrieval
+- generation alone never confers professional reliance
+- review binds the exact artifact version reviewed
+- destination and confidentiality are checked before release
+- source-quality downgrade is an explicit policy event
+- prior verification can be reused only within a defined freshness window
+
+Database implementation remains append-only and must begin with the next generated migration after `0025`.
