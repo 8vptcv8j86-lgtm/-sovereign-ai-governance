@@ -398,3 +398,46 @@ Core rules introduced:
 - prior verification can be reused only within a defined freshness window
 
 Database implementation remains append-only and must begin with the next generated migration after `0025`.
+
+
+## 2026-09-21 — CapSoftware-informed R11
+
+Working branch:
+`feature/wiki-skill-governance-capsoftware-r11`
+
+Preserved predecessor:
+`archive/wiki-skill-governance-claude-legal-r10-2026-09-21`
+
+Parent:
+`018e1e587ea7132a4bbe87cf788c76081134a123`
+
+Purpose:
+
+Add governed session capture and replayable execution evidence for selected high-risk workflows while preventing capture from becoming a default surveillance mechanism.
+
+R11 adds:
+
+- Governed Session Capture Registry
+- Capture Consent and Scope Policy
+- Session Artifact Manifest
+- Timestamped Evidence Anchor Registry
+- Capture Storage and Residency Profiles
+- Derived Media / Transcript Provenance
+- Capture Integrity, Recovery and Completion Ledger
+- reusable governed-session-capture template
+
+Core rules introduced:
+
+- capture requires explicit purpose, policy and authorization
+- capture, storage, processing, upload, sharing and deletion are separate operations
+- capture scope is minimum-necessary
+- source media and AI-derived artifacts remain distinct
+- every artifact/version carries an integrity digest
+- timestamp anchors bind exact media version and time range
+- storage residency and processing location are independently governed
+- partial/recovered sessions cannot masquerade as complete
+- upload/disclosure must pass existing evidence-room and destination-release gates
+- retention and deletion produce auditable evidence
+- continuous monitoring is not authorized by default
+
+Database implementation remains append-only and must begin with the next generated migration after `0025`.
