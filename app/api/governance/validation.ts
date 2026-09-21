@@ -621,7 +621,7 @@ const schemas: Record<string, Schema> = {
 export function validateActionPayload(input: Record<string, unknown>) {
   const action = cleanText(input.action, "action", 80);
   const schema = schemas[action];
-  if (!schema) throw badRequest("Unknown action", "UNKNOWN_ACTION");
+  if (!schema) throw badRequest("Unknown action");
 
   const output: Record<string, unknown> = { action };
   for (const [name, rule] of Object.entries(schema)) {
