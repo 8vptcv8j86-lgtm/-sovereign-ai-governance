@@ -12,6 +12,228 @@ type View = {
   endpoint?: string;
 };
 const views: Record<string, View> = {
+  "Data protection purpose & lawfulness": {
+    key: "privacyRecords",
+    title: "Purpose, lawfulness and data minimisation",
+    intro:
+      "Document why personal data is processed, the lawful basis, necessity and the minimum data required before processing begins.",
+    endpoint: "/api/privacy-governance",
+    action: "record_privacy_purpose",
+    button: "Record purpose & lawfulness",
+    fields: [
+      f("systemCode", "AI system or process code"),
+      f("subjectCode", "Processing activity code"),
+      f("businessPurpose", "Business purpose", "textarea"),
+      f("lawfulBasis", "Lawful basis"),
+      f("necessityAssessment", "Necessity assessment", "textarea"),
+      f("minimisationDecision", "Data minimisation decision", "textarea"),
+      f("dataCategories", "Personal data categories"),
+      f("jurisdiction", "Jurisdiction"),
+      f("owner", "Accountable owner"),
+      f("evidenceRefs", "Evidence references", "textarea"),
+      f("nextReview", "Next review", "date"),
+    ],
+    columns: ["entity", "recordCode", "systemCode", "state", "jurisdiction", "owner", "nextReview"],
+  },
+  "Data inventory & flows": {
+    key: "privacyRecords",
+    title: "Personal data inventory and flow mapping",
+    intro:
+      "Trace what personal data is processed, where it originates, every destination and recipient, access roles, transfers and storage locations.",
+    endpoint: "/api/privacy-governance",
+    action: "record_privacy_data_flow",
+    button: "Record data flow",
+    fields: [
+      f("systemCode", "AI system or process code"),
+      f("subjectCode", "Processing activity code"),
+      f("dataCategories", "Personal data categories", "textarea"),
+      f("source", "Collection source"),
+      f("destinations", "Systems, recipients and destinations", "textarea"),
+      f("accessRoles", "Who has access", "textarea"),
+      f("internationalTransfers", "International transfers"),
+      f("storageLocations", "Storage locations"),
+      f("jurisdiction", "Jurisdiction"),
+      f("owner", "Accountable owner"),
+      f("evidenceRefs", "Data maps / evidence references", "textarea"),
+      f("nextReview", "Next review", "date"),
+    ],
+    columns: ["entity", "recordCode", "systemCode", "state", "jurisdiction", "owner", "nextReview"],
+  },
+  "Data subject rights": {
+    key: "privacyRecords",
+    title: "Data subject rights operations",
+    intro:
+      "Track access, correction, objection, deletion and consent-withdrawal requests through completion with evidence.",
+    endpoint: "/api/privacy-governance",
+    action: "record_privacy_rights",
+    button: "Record rights request",
+    fields: [
+      f("systemCode", "Related system or process code"),
+      f("subjectCode", "Request / subject reference"),
+      f("rightType", "Right exercised", "select", ["access", "correction", "objection", "deletion", "restriction", "portability", "withdraw_consent"]),
+      f("requestStatus", "Request status", "select", ["received", "identity_verified", "in_progress", "fulfilled", "denied", "closed"]),
+      f("receivedDate", "Received date", "date"),
+      f("deadline", "Response deadline", "date"),
+      f("systemsSearched", "Systems searched", "textarea"),
+      f("responseEvidence", "Response / completion evidence", "textarea"),
+      f("jurisdiction", "Jurisdiction"),
+      f("owner", "Case owner"),
+      f("evidenceRefs", "Evidence references", "textarea"),
+    ],
+    columns: ["entity", "recordCode", "subjectCode", "state", "jurisdiction", "owner", "createdAt"],
+  },
+  "Third-party privacy": {
+    key: "privacyRecords",
+    title: "Third-party privacy assessment",
+    intro:
+      "Assess processors and vendors before data sharing, including data scope, agreements, security evidence, transfers and end-of-contract disposition.",
+    endpoint: "/api/privacy-governance",
+    action: "assess_privacy_third_party",
+    button: "Assess third party",
+    fields: [
+      f("systemCode", "Related system or process code"),
+      f("vendorName", "Vendor / processor name"),
+      f("dataShared", "Personal data shared", "textarea"),
+      f("agreementStatus", "DPA / agreement status"),
+      f("securityAssessment", "Security assessment", "textarea"),
+      f("subprocessors", "Known subprocessors"),
+      f("transferLocations", "Processing / transfer locations"),
+      f("exitDisposition", "Return / deletion at contract end", "textarea"),
+      f("jurisdiction", "Jurisdiction"),
+      f("owner", "Accountable owner"),
+      f("evidenceRefs", "DPA / questionnaire / evidence references", "textarea"),
+      f("nextReview", "Next review", "date"),
+    ],
+    columns: ["entity", "recordCode", "systemCode", "state", "jurisdiction", "owner", "nextReview"],
+  },
+  "Privacy risk & DPIA": {
+    key: "privacyRecords",
+    title: "Privacy risk and DPIA assessment",
+    intro:
+      "Assess potential harm to individuals and document high-risk processing, safeguards and residual risk before go-live.",
+    endpoint: "/api/privacy-governance",
+    action: "conduct_privacy_dpia",
+    button: "Record DPIA",
+    fields: [
+      f("systemCode", "AI system or process code"),
+      f("subjectCode", "Processing activity code"),
+      f("processingDescription", "Processing description", "textarea"),
+      f("highRiskTrigger", "Why DPIA / high-risk review is required", "textarea"),
+      f("affectedPeople", "People affected"),
+      f("riskToIndividual", "Potential harm to individuals", "textarea"),
+      f("likelihood", "Likelihood"),
+      f("impact", "Impact / severity"),
+      f("controls", "Existing controls", "textarea"),
+      f("safeguards", "Additional safeguards", "textarea"),
+      f("residualRisk", "Residual risk"),
+      f("consultationRequired", "Regulator / DPO consultation required?"),
+      f("jurisdiction", "Jurisdiction"),
+      f("owner", "DPIA owner"),
+      f("evidenceRefs", "DPIA / evidence references", "textarea"),
+      f("nextReview", "Next review", "date"),
+    ],
+    columns: ["entity", "recordCode", "systemCode", "state", "jurisdiction", "owner", "nextReview"],
+  },
+  "AI data protection": {
+    key: "privacyRecords",
+    title: "AI data protection assessment",
+    intro:
+      "Determine what personal data enters an AI system, where it goes, whether it is retained or used for training, and whether automated decisions require human review.",
+    endpoint: "/api/privacy-governance",
+    action: "assess_ai_data_privacy",
+    button: "Assess AI data use",
+    fields: [
+      f("systemCode", "AI system code"),
+      f("personalDataInputs", "Personal data inputs", "textarea"),
+      f("providerDestinations", "Providers / destinations receiving data", "textarea"),
+      f("trainingUse", "Used for model/provider training?"),
+      f("promptRetention", "Prompt / input retention"),
+      f("exposureRisk", "Potential personal-data exposure", "textarea"),
+      f("automatedDecisioning", "Automated decisions involved?"),
+      f("humanReview", "Human review / contestability control", "textarea"),
+      f("specialCategoryData", "Sensitive / special-category data"),
+      f("jurisdiction", "Jurisdiction"),
+      f("owner", "Accountable owner"),
+      f("evidenceRefs", "Provider terms / assessment evidence", "textarea"),
+      f("nextReview", "Next review", "date"),
+    ],
+    columns: ["entity", "recordCode", "systemCode", "state", "jurisdiction", "owner", "nextReview"],
+  },
+  "Retention & deletion": {
+    key: "privacyRecords",
+    title: "Retention and deletion governance",
+    intro:
+      "Define why data is retained, the approved period, deletion trigger, archive protections and the evidence proving deletion or anonymisation.",
+    endpoint: "/api/privacy-governance",
+    action: "record_privacy_retention",
+    button: "Record retention rule",
+    fields: [
+      f("systemCode", "System or process code"),
+      f("subjectCode", "Dataset / processing activity code"),
+      f("retentionPurpose", "Why the data is retained", "textarea"),
+      f("retentionPeriod", "Approved retention period"),
+      f("deletionTrigger", "Deletion / anonymisation trigger"),
+      f("archiveProtection", "Archived-data controls", "textarea"),
+      f("deletionEvidence", "How deletion is proven", "textarea"),
+      f("jurisdiction", "Jurisdiction"),
+      f("owner", "Data owner"),
+      f("evidenceRefs", "Retention schedule / evidence references", "textarea"),
+      f("nextReview", "Next review", "date"),
+    ],
+    columns: ["entity", "recordCode", "systemCode", "state", "jurisdiction", "owner", "nextReview"],
+  },
+  "Privacy governance evidence": {
+    key: "privacyRecords",
+    title: "Privacy governance and regulator evidence",
+    intro:
+      "Bind accountable ownership, control evidence, review cadence and regulator-readiness evidence into an auditable governance record.",
+    endpoint: "/api/privacy-governance",
+    action: "record_privacy_evidence",
+    button: "Record governance evidence",
+    fields: [
+      f("systemCode", "System or process code"),
+      f("accountableOwner", "Data / control owner"),
+      f("policies", "Applicable policies", "textarea"),
+      f("controlEvidence", "Control evidence", "textarea"),
+      f("trainingRecords", "Training / awareness evidence"),
+      f("breachLogs", "Breach / incident records"),
+      f("ropaReference", "Record of Processing Activities reference"),
+      f("reviewCadence", "Review cadence"),
+      f("regulatorReadiness", "Regulator-ready status"),
+      f("jurisdiction", "Jurisdiction"),
+      f("owner", "DPO / governance owner"),
+      f("evidenceRefs", "Evidence-folder references", "textarea"),
+      f("nextReview", "Next review", "date"),
+    ],
+    columns: ["entity", "recordCode", "systemCode", "state", "jurisdiction", "owner", "nextReview"],
+  },
+  "Privacy record transitions": {
+    key: "privacyRecords",
+    title: "Privacy record state transitions",
+    intro:
+      "Move privacy records through review, approval, remediation, closure or withdrawal with optimistic concurrency and audit evidence.",
+    endpoint: "/api/privacy-governance",
+    action: "transition_privacy_record",
+    button: "Transition privacy record",
+    fields: [
+      f("entity", "Privacy ledger"),
+      f("recordCode", "Record code"),
+      f("expectedState", "Current expected state"),
+      f("nextState", "Next state"),
+    ],
+    columns: ["entity", "recordCode", "systemCode", "state", "owner", "updatedAt"],
+  },
+  "Privacy regulator export": {
+    key: "privacyRecords",
+    title: "Regulator-ready privacy evidence package",
+    intro:
+      "Generate a digest-bound institution or system-scoped package containing purpose, flows, rights, vendors, risks, DPIAs, AI-data assessments, retention and governance evidence.",
+    endpoint: "/api/privacy-governance",
+    action: "export_privacy_evidence_package",
+    button: "Export privacy evidence",
+    fields: [f("systemCode", "Optional AI system code")],
+    columns: ["entity", "recordCode", "systemCode", "state", "owner", "createdAt"],
+  },
   "Advanced governance": {
     key: "advancedRecords",
     title: "R2–R12 advanced governance runtime",
@@ -2877,7 +3099,8 @@ export function OperationalWorkspace({
       if (
         c.action === "export_package" ||
         c.action === "export_skill_evidence_package" ||
-        c.action === "export_advanced_governance_package"
+        c.action === "export_advanced_governance_package" ||
+        c.action === "export_privacy_evidence_package"
       ) {
         const blob = new Blob([JSON.stringify(response.result, null, 2)], {
           type: "application/json",
@@ -2890,7 +3113,9 @@ export function OperationalWorkspace({
             ? `sentinel-skill-evidence-${String(payload.skillCode)}.json`
             : c.action === "export_advanced_governance_package"
               ? "sentinel-r2-r12-governance-evidence.json"
-              : `sentinel-evidence-${String(payload.systemCode)}.json`;
+              : c.action === "export_privacy_evidence_package"
+                ? `sentinel-privacy-evidence-${String(payload.systemCode || "institution")}.json`
+                : `sentinel-evidence-${String(payload.systemCode)}.json`;
         link.click();
         URL.revokeObjectURL(url);
       }
