@@ -3,13 +3,14 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 test("every authorized governance action has backend dispatch and an operator path", async () => {
-  const [access, validation, governance, skill, advanced, privacy, workspace, page] = await Promise.all([
+  const [access, validation, governance, skill, advanced, privacy, privacyRegistry, workspace, page] = await Promise.all([
     readFile("app/api/governance/access.ts", "utf8"),
     readFile("app/api/governance/validation.ts", "utf8"),
     readFile("app/api/governance/route.ts", "utf8"),
     readFile("app/api/skill-governance/route.ts", "utf8"),
     readFile("app/api/advanced-governance/route.ts", "utf8"),
     readFile("app/api/privacy-governance/route.ts", "utf8"),
+    readFile("app/api/privacy-governance/registry.ts", "utf8"),
     readFile("app/operational-workspace.tsx", "utf8"),
     readFile("app/page.tsx", "utf8"),
   ]);
@@ -30,7 +31,7 @@ test("every authorized governance action has backend dispatch and an operator pa
     [...privacy.matchAll(/action\s*===\s*"([a-z0-9_]+)"/g)].map((m) => m[1]),
   );
   const privacyActionMap = new Set(
-    [...privacy.matchAll(/action:\s*"([a-z0-9_]+)"/g)].map((m) => m[1]),
+    [...privacyRegistry.matchAll(/action:\s*"([a-z0-9_]+)"/g)].map((m) => m[1]),
   );
   const backend = new Set([
     ...governanceBranches,
