@@ -96,6 +96,23 @@ export const ACTION_ROLES = {
     "auditor",
     "accountable_executive",
   ],
+  record_privacy_purpose: ["admin", "system_owner", "reviewer"],
+  record_privacy_data_flow: ["admin", "system_owner", "reviewer"],
+  record_privacy_rights: ["admin", "reviewer", "auditor"],
+  assess_privacy_third_party: ["admin", "system_owner", "reviewer", "auditor"],
+  assess_privacy_risk: ["admin", "system_owner", "reviewer", "auditor"],
+  conduct_privacy_dpia: ["admin", "reviewer", "auditor"],
+  assess_ai_data_privacy: ["admin", "system_owner", "reviewer", "auditor"],
+  record_privacy_retention: ["admin", "system_owner", "reviewer", "auditor"],
+  record_privacy_evidence: ["admin", "reviewer", "auditor"],
+  transition_privacy_record: ["admin", "reviewer", "approver", "auditor"],
+  export_privacy_evidence_package: [
+    "admin",
+    "system_owner",
+    "reviewer",
+    "auditor",
+    "accountable_executive",
+  ],
 } satisfies Record<string, readonly Role[]>;
 
 export function assertKnownRole(role: string): asserts role is Role {
