@@ -70,8 +70,8 @@ jobs:
           if (!sql.includes(expected)) {
             throw new Error("Latest journal migration is missing: " + expected);
           }
-          if (latest.idx !== 26 || !latest.tag.startsWith("0026_")) {
-            throw new Error("Expected generated R2-R12 migration head 0026");
+          if (latest.idx !== 27 || !latest.tag.startsWith("0027_")) {
+            throw new Error("Expected generated privacy migration head 0027");
           }
-          JSON.parse(await readFile("drizzle/meta/0026_snapshot.json", "utf8"));
+          JSON.parse(await readFile("drizzle/meta/0027_snapshot.json", "utf8"));
           NODE
