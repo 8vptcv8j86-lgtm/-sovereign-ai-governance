@@ -2633,8 +2633,8 @@ async function responseJson(response: Response): Promise<ApiPayload> {
       response.headers.get("x-request-id") ||
       response.headers.get("request-id");
     const plain = raw
-      .replace(/<script[\\s\\S]*?<\\/script>/gi, " ")
-      .replace(/<style[\\s\\S]*?<\\/style>/gi, " ")
+      .replace(new RegExp("<script[\\\\s\\\\S]*?</script>", "gi"), " ")
+      .replace(new RegExp("<style[\\\\s\\\\S]*?</style>", "gi"), " ")
       .replace(/<[^>]+>/g, " ")
       .replace(/\\s+/g, " ")
       .trim()
