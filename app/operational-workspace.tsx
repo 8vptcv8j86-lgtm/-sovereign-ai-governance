@@ -2638,7 +2638,7 @@ async function responseJson(response: Response): Promise<ApiPayload> {
   const payload = (await response.json()) as ApiPayload;
   if (!response.ok)
     throw new Error(
-      payload.message ||
+      (typeof payload.message === "string" && payload.message) ||
         payload.error ||
         `Request failed with status ${response.status}.`,
     );
