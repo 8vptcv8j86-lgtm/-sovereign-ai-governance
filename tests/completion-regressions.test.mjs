@@ -33,13 +33,14 @@ test("critical authorization writes are atomic and duplicate approvals are const
 });
 
 test("every authorized governance action is validated and dispatched", async () => {
-  const [access, validation, route, skillRoute, advancedRoute, privacyRoute] = await Promise.all([
+  const [access, validation, route, skillRoute, advancedRoute, privacyRoute, privacyRegistry] = await Promise.all([
     readFile("app/api/governance/access.ts", "utf8"),
     readFile("app/api/governance/validation.ts", "utf8"),
     readFile("app/api/governance/route.ts", "utf8"),
     readFile("app/api/skill-governance/route.ts", "utf8"),
     readFile("app/api/advanced-governance/route.ts", "utf8"),
     readFile("app/api/privacy-governance/route.ts", "utf8"),
+    readFile("app/api/privacy-governance/registry.ts", "utf8"),
   ]);
   const roleActions = new Set(
     [...access.matchAll(/^\s{2}([a-z][a-z0-9_]+):\s/gm)].map(
@@ -101,7 +102,7 @@ test("every authorized governance action is validated and dispatched", async () 
   ]);
   const privacyBranches = new Set([
     ...[...privacyRoute.matchAll(/action\s*===\s*"([a-z0-9_]+)"/g)].map((match) => match[1]),
-    ...[...privacyRoute.matchAll(/action:\s*"([a-z0-9_]+)"/g)].map((match) => match[1]),
+    ...[...privacyRegistry.matchAll(/action:\s*"([a-z0-9_]+)"/g)].map((match) => match[1]),
   ]);
   const branches = new Set([
     ...governanceBranches,
