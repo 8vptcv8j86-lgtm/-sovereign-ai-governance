@@ -33,12 +33,14 @@ test("critical authorization writes are atomic and duplicate approvals are const
 });
 
 test("every authorized governance action is validated and dispatched", async () => {
-  const [access, validation, route, skillRoute, advancedRoute] = await Promise.all([
+  const [access, validation, route, skillRoute, advancedRoute, privacyRoute, privacyRegistry] = await Promise.all([
     readFile("app/api/governance/access.ts", "utf8"),
     readFile("app/api/governance/validation.ts", "utf8"),
     readFile("app/api/governance/route.ts", "utf8"),
     readFile("app/api/skill-governance/route.ts", "utf8"),
     readFile("app/api/advanced-governance/route.ts", "utf8"),
+    readFile("app/api/privacy-governance/route.ts", "utf8"),
+    readFile("app/api/privacy-governance/registry.ts", "utf8"),
   ]);
   const roleActions = new Set(
     [...access.matchAll(/^\s{2}([a-z][a-z0-9_]+):\s/gm)].map(
@@ -85,18 +87,37 @@ test("every authorized governance action is validated and dispatched", async () 
     "transition_advanced_record",
     "export_advanced_governance_package",
   ]);
+  const privacyActions = new Set([
+    "record_privacy_purpose",
+    "record_privacy_data_flow",
+    "record_privacy_rights",
+    "assess_privacy_third_party",
+    "assess_privacy_risk",
+    "conduct_privacy_dpia",
+    "assess_ai_data_privacy",
+    "record_privacy_retention",
+    "record_privacy_evidence",
+    "transition_privacy_record",
+    "export_privacy_evidence_package",
+  ]);
+  const privacyBranches = new Set([
+    ...[...privacyRoute.matchAll(/action\s*===\s*"([a-z0-9_]+)"/g)].map((match) => match[1]),
+    ...[...privacyRegistry.matchAll(/action:\s*"([a-z0-9_]+)"/g)].map((match) => match[1]),
+  ]);
   const branches = new Set([
     ...governanceBranches,
     ...skillBranches,
     ...advancedBranches,
+    ...privacyBranches,
   ]);
 
-  assert.equal(roleActions.size, 69);
+  assert.equal(roleActions.size, 80);
   assert.deepEqual(
     [...roleActions].filter(
       (action) =>
         !skillActions.has(action) &&
         !advancedActions.has(action) &&
+        !privacyActions.has(action) &&
         !schemas.has(action),
     ),
     [],
@@ -107,6 +128,10 @@ test("every authorized governance action is validated and dispatched", async () 
   );
   assert.deepEqual(
     [...advancedActions].filter((action) => !advancedBranches.has(action)),
+    [],
+  );
+  assert.deepEqual(
+    [...privacyActions].filter((action) => !privacyBranches.has(action)),
     [],
   );
   assert.deepEqual(
