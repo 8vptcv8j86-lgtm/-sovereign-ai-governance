@@ -1210,8 +1210,8 @@ const privacyGovernanceLedger = (tableName: string) =>
       updatedAt: text("updated_at"),
     },
     (table) => [
-      index(\`idx_\${tableName}_org_state\`).on(table.organizationId, table.state),
-      index(\`idx_\${tableName}_org_system\`).on(table.organizationId, table.systemCode),
+      index(`idx_${tableName}_org_state`).on(table.organizationId, table.state),
+      index(`idx_${tableName}_org_system`).on(table.organizationId, table.systemCode),
     ],
   );
 
