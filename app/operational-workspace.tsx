@@ -2626,14 +2626,44 @@ type ApiPayload = {
 };
 async function responseJson(response: Response): Promise<ApiPayload> {
   const contentType = response.headers.get("content-type") || "";
-  if (!contentType.includes("application/json"))
+  const raw = await response.text();
+  if (!contentType.includes("application/json")) {
+    const requestId =
+      response.headers.get("cf-ray") ||
+      response.headers.get("x-request-id") ||
+      response.headers.get("request-id");
+    const plain = raw
+      .replace(new RegExp("<script[\\\\s\\\\S]*?</script>", "gi"), " ")
+      .replace(new RegExp("<style[\\\\s\\\\S]*?</style>", "gi"), " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\\s+/g, " ")
+      .trim()
+      .slice(0, 240);
     throw new Error(
-      "The server returned an unexpected response. Please try again.",
+      [
+        `Server returned HTTP ${response.status} instead of JSON.`,
+        plain || "No response body was provided.",
+        requestId ? `Request ID: ${requestId}` : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
     );
-  const payload = (await response.json()) as ApiPayload;
+  }
+  let payload: ApiPayload;
+  try {
+    payload = JSON.parse(raw) as ApiPayload;
+  } catch {
+    throw new Error(
+      `Server returned malformed JSON (HTTP ${response.status}).`,
+    );
+  }
   if (!response.ok)
     throw new Error(
-      payload.error || "The request could not be completed. Please try again.",
+      String(
+        payload.message ||
+          payload.error ||
+          `The request could not be completed (HTTP ${response.status}).`,
+      ),
     );
   return payload;
 }
