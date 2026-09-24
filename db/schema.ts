@@ -1186,7 +1186,7 @@ export const schemaPolicyMigrationRecords = advancedGovernanceLedger("schema_pol
 export const schemaPolicyVerificationEvents = advancedGovernanceLedger("schema_policy_verification_events");
 
 
-/* Data Protection & Privacy Governance Module — migration source */
+/* Data Protection & Privacy Governance Module — verified migration source */
 const privacyGovernanceLedger = (tableName: string) =>
   sqliteTable(
     tableName,
