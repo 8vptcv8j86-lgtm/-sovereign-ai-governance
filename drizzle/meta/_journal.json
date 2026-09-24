@@ -190,6 +190,13 @@
       "when": 1789994070625,
       "tag": "0026_blushing_wonder_man",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "6",
+      "when": 1790255103682,
+      "tag": "0027_conscious_squadron_sinister",
+      "breakpoints": true
     }
   ]
 }
