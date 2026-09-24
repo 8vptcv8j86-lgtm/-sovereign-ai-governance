@@ -1184,3 +1184,43 @@ export const securityLintRules = advancedGovernanceLedger("security_lint_rules")
 export const securityLintFindings = advancedGovernanceLedger("security_lint_findings");
 export const schemaPolicyMigrationRecords = advancedGovernanceLedger("schema_policy_migration_records");
 export const schemaPolicyVerificationEvents = advancedGovernanceLedger("schema_policy_verification_events");
+
+
+/* Data Protection & Privacy Governance Module */
+const privacyGovernanceLedger = (tableName: string) =>
+  sqliteTable(
+    tableName,
+    {
+      id: integer("id").primaryKey({ autoIncrement: true }),
+      recordCode: text("record_code").notNull().unique(),
+      organizationId: text("organization_id").notNull(),
+      systemCode: text("system_code"),
+      subjectCode: text("subject_code"),
+      state: text("state").notNull().default("draft"),
+      jurisdiction: text("jurisdiction"),
+      owner: text("owner").notNull(),
+      payload: text("payload", { mode: "json" })
+        .$type<Record<string, unknown>>()
+        .notNull(),
+      contentDigest: text("content_digest").notNull(),
+      evidenceRefs: text("evidence_refs").notNull().default(""),
+      nextReview: text("next_review"),
+      createdBy: text("created_by").notNull(),
+      createdAt: created(),
+      updatedAt: text("updated_at"),
+    },
+    (table) => [
+      index(\`idx_\${tableName}_org_state\`).on(table.organizationId, table.state),
+      index(\`idx_\${tableName}_org_system\`).on(table.organizationId, table.systemCode),
+    ],
+  );
+
+export const privacyPurposeLawfulness = privacyGovernanceLedger("privacy_purpose_lawfulness");
+export const privacyDataInventoryFlows = privacyGovernanceLedger("privacy_data_inventory_flows");
+export const privacyRightsRequests = privacyGovernanceLedger("privacy_rights_requests");
+export const privacyThirdPartyAssessments = privacyGovernanceLedger("privacy_third_party_assessments");
+export const privacyRiskAssessments = privacyGovernanceLedger("privacy_risk_assessments");
+export const privacyDpiaAssessments = privacyGovernanceLedger("privacy_dpia_assessments");
+export const privacyAiDataAssessments = privacyGovernanceLedger("privacy_ai_data_assessments");
+export const privacyRetentionRecords = privacyGovernanceLedger("privacy_retention_records");
+export const privacyGovernanceEvidence = privacyGovernanceLedger("privacy_governance_evidence");
