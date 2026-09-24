@@ -2626,14 +2626,21 @@ type ApiPayload = {
 };
 async function responseJson(response: Response): Promise<ApiPayload> {
   const contentType = response.headers.get("content-type") || "";
-  if (!contentType.includes("application/json"))
+  if (!contentType.includes("application/json")) {
+    const requestId =
+      response.headers.get("cf-ray") ||
+      response.headers.get("x-request-id") ||
+      "unavailable";
     throw new Error(
-      "The server returned an unexpected response. Please try again.",
+      `Server response ${response.status} was not JSON (request ${requestId}). Please report this code instead of retrying.`,
     );
+  }
   const payload = (await response.json()) as ApiPayload;
   if (!response.ok)
     throw new Error(
-      payload.error || "The request could not be completed. Please try again.",
+      (typeof payload.message === "string" && payload.message) ||
+        payload.error ||
+        `Request failed with status ${response.status}.`,
     );
   return payload;
 }

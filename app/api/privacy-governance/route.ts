@@ -237,7 +237,7 @@ export async function POST(request: Request) {
       if (TERMINAL_STATES.has(existing.state.toLowerCase())) {
         throw new Error("Terminal privacy records cannot be changed");
       }
-      const rows = await auditedWrite(
+      await auditedWrite(
         db,
         actor,
         request,
@@ -257,8 +257,7 @@ export async function POST(request: Request) {
               eq(table.recordCode, recordCode),
               eq(table.state, expectedState),
             ),
-          )
-          .returning(),
+          ),
         {
           action: "privacy." + entity + ".transitioned",
           entityType: entity,
@@ -266,8 +265,20 @@ export async function POST(request: Request) {
           details: JSON.stringify({ from: expectedState, to: nextState }),
         },
       );
-      if (!rows[0]) throw new Error("Record changed; refresh and retry");
-      return json({ result: rows[0] });
+      const transitioned = await db
+        .select()
+        .from(table)
+        .where(
+          and(
+            eq(table.organizationId, actor.organizationId),
+            eq(table.recordCode, recordCode),
+          ),
+        )
+        .get();
+      if (!transitioned || transitioned.state !== nextState) {
+        throw new Error("Record changed; refresh and retry");
+      }
+      return json({ result: transitioned });
     }
 
     const entity = entityForAction(action);
@@ -295,7 +306,7 @@ export async function POST(request: Request) {
       nextReview,
     });
 
-    const rows = await auditedWrite(
+    await auditedWrite(
       db,
       actor,
       request,
@@ -314,8 +325,7 @@ export async function POST(request: Request) {
           nextReview,
           createdBy: actor.email,
           updatedAt: new Date().toISOString(),
-        })
-        .returning(),
+        }),
       {
         action: "privacy." + entity + ".created",
         entityType: entity,
@@ -323,7 +333,18 @@ export async function POST(request: Request) {
         details: JSON.stringify({ systemCode, state, jurisdiction }),
       },
     );
-    return json({ result: rows[0] });
+    const created = await db
+      .select()
+      .from(table)
+      .where(
+        and(
+          eq(table.organizationId, actor.organizationId),
+          eq(table.recordCode, recordCode),
+        ),
+      )
+      .get();
+    if (!created) throw new Error("Privacy record write could not be verified");
+    return json({ result: created });
   } catch (error) {
     return errorResponse(error, "privacy-governance.write");
   }
