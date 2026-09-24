@@ -4206,6 +4206,28 @@ export async function POST(request: Request) {
           ? db.select().from(s.skillRollbacks).where(and(eq(s.skillRollbacks.organizationId, org), inArray(s.skillRollbacks.skillCode, skillCodes)))
           : Promise.resolve([]),
       ]);
+      const [
+        privacyPurposeLawfulness,
+        privacyDataInventoryFlows,
+        privacyRightsRequests,
+        privacyThirdPartyAssessments,
+        privacyRiskAssessments,
+        privacyDpiaAssessments,
+        privacyAiDataAssessments,
+        privacyRetentionRecords,
+        privacyGovernanceEvidence,
+      ] = await Promise.all([
+        db.select().from(s.privacyPurposeLawfulness).where(and(eq(s.privacyPurposeLawfulness.organizationId, org), eq(s.privacyPurposeLawfulness.systemCode, code))),
+        db.select().from(s.privacyDataInventoryFlows).where(and(eq(s.privacyDataInventoryFlows.organizationId, org), eq(s.privacyDataInventoryFlows.systemCode, code))),
+        db.select().from(s.privacyRightsRequests).where(and(eq(s.privacyRightsRequests.organizationId, org), eq(s.privacyRightsRequests.systemCode, code))),
+        db.select().from(s.privacyThirdPartyAssessments).where(and(eq(s.privacyThirdPartyAssessments.organizationId, org), eq(s.privacyThirdPartyAssessments.systemCode, code))),
+        db.select().from(s.privacyRiskAssessments).where(and(eq(s.privacyRiskAssessments.organizationId, org), eq(s.privacyRiskAssessments.systemCode, code))),
+        db.select().from(s.privacyDpiaAssessments).where(and(eq(s.privacyDpiaAssessments.organizationId, org), eq(s.privacyDpiaAssessments.systemCode, code))),
+        db.select().from(s.privacyAiDataAssessments).where(and(eq(s.privacyAiDataAssessments.organizationId, org), eq(s.privacyAiDataAssessments.systemCode, code))),
+        db.select().from(s.privacyRetentionRecords).where(and(eq(s.privacyRetentionRecords.organizationId, org), eq(s.privacyRetentionRecords.systemCode, code))),
+        db.select().from(s.privacyGovernanceEvidence).where(and(eq(s.privacyGovernanceEvidence.organizationId, org), eq(s.privacyGovernanceEvidence.systemCode, code))),
+      ]);
+
       const relatedEntityCodes = [
         code,
         ...models.map((row) => String(row.id)),
@@ -4218,6 +4240,15 @@ export async function POST(request: Request) {
         ...modelRetirements.map((row) => row.retirementCode),
         ...agents.map((row) => row.agentCode),
         ...skills.map((row) => row.skillCode),
+        ...privacyPurposeLawfulness.map((row) => row.recordCode),
+        ...privacyDataInventoryFlows.map((row) => row.recordCode),
+        ...privacyRightsRequests.map((row) => row.recordCode),
+        ...privacyThirdPartyAssessments.map((row) => row.recordCode),
+        ...privacyRiskAssessments.map((row) => row.recordCode),
+        ...privacyDpiaAssessments.map((row) => row.recordCode),
+        ...privacyAiDataAssessments.map((row) => row.recordCode),
+        ...privacyRetentionRecords.map((row) => row.recordCode),
+        ...privacyGovernanceEvidence.map((row) => row.recordCode),
         ...accessGrants.map((row) => row.grantCode),
         ...correctiveActions.map((row) => row.actionCode),
       ];
@@ -4334,6 +4365,17 @@ export async function POST(request: Request) {
         publicSectorAssessments,
         africaFirstAssessments,
         privacyComplianceAssessments,
+        dataProtectionGovernance: {
+          purposeAndLawfulness: privacyPurposeLawfulness,
+          dataInventoryAndFlows: privacyDataInventoryFlows,
+          dataSubjectRights: privacyRightsRequests,
+          thirdParties: privacyThirdPartyAssessments,
+          privacyRisk: privacyRiskAssessments,
+          dpias: privacyDpiaAssessments,
+          aiDataProtection: privacyAiDataAssessments,
+          retentionAndDeletion: privacyRetentionRecords,
+          governanceEvidence: privacyGovernanceEvidence,
+        },
         sovereignResilience,
         recoveryAssurance: {
           status: latestRecovery?.outcome ?? "NO EXERCISE RECORDED",
