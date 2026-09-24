@@ -92,6 +92,7 @@ const nav = [
   "Data inventory & flows",
   "Data subject rights",
   "Third-party privacy",
+  "Privacy risk assessment",
   "Privacy risk & DPIA",
   "AI data protection",
   "Retention & deletion",
