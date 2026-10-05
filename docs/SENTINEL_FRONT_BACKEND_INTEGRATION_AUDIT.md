@@ -1,5 +1,15 @@
 # Sentinel Frontend / Backend Integration Audit
 
+## Current review — October 5, 2026
+
+The September 21 body below is historical. R2–R12 organization-scoped records, API dispatch, role policies, validation, operator paths and exports are now implemented; source migration head is `0027_conscious_squadron_sinister.sql`. The seven executable audit regressions and full 32-test suite pass after the atomic transaction correction. Typecheck, lint, production build and artifact validation pass. Next.js is patched to 16.3.6, and the production dependency audit reports zero known vulnerabilities.
+
+The advanced governance records implement selected invariants and state transitions. Their presence does not establish external sandboxing, network restrictions, notification delivery, runtime enforcement, capture or ingestion integrations. The architectural revision descriptions include proposed behavior beyond the current routes.
+
+Authenticated production registration, approval/rejection, role denial, tenant isolation, privacy and export have not been completed. Production migration-history confirmation and live isolated restoration remain open. See `PRODUCTION_READINESS.md` for the current evidence boundary.
+
+## Historical integration audit — September 21, 2026
+
 Date: 2026-09-21
 
 Branch: `feature/sentinel-integration-hardening`
