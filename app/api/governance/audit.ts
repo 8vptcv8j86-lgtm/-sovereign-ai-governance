@@ -1,4 +1,4 @@
-import { asc, desc, eq, sql } from "drizzle-orm";
+import { asc, desc, eq, sql, type SQL } from "drizzle-orm";
 import type { getDb } from "../../../db";
 import * as s from "../../../db/schema";
 import type { Actor } from "../../org-auth";
@@ -9,7 +9,7 @@ type AuditInput = {
   entityType: string;
   entityCode: string;
   details: string;
-  guard?: unknown;
+  guard?: SQL;
 };
 type AuditEvent = typeof s.auditEvents.$inferSelect;
 
@@ -61,8 +61,15 @@ async function preparedAudit(
     occurredAt,
     previousHash,
   });
-  return db.insert(s.auditEvents).values({
-    organizationId: actor.organizationId,
+  // Query builders are thenable. Wrapping the statement prevents this async
+  // helper from executing it before the caller adds it to the transaction.
+  return { statement: db.insert(s.auditEvents).values({
+    // D1 executes batches sequentially in one transaction. A false guard
+    // violates this column's NOT NULL constraint and rolls back every write.
+    // Evaluate here so changes() still refers to the final domain statement.
+    organizationId: input.guard
+      ? sql`case when ${input.guard} then ${actor.organizationId} else null end`
+      : actor.organizationId,
     actorEmail: actor.email,
     actorRole: actor.role,
     action: input.action,
@@ -74,7 +81,7 @@ async function preparedAudit(
     eventHash,
     hashVersion: HASH_VERSION,
     createdAt: occurredAt,
-  });
+  }) };
 }
 
 export async function appendAuditEvent(
@@ -85,7 +92,7 @@ export async function appendAuditEvent(
 ) {
   for (let attempt = 0; attempt < 5; attempt += 1) {
     try {
-      const statement = await preparedAudit(db, actor, request, input);
+      const { statement } = await preparedAudit(db, actor, request, input);
       const rows = await statement.returning();
       return rows[0];
     } catch (error) {
@@ -130,19 +137,25 @@ export async function auditedBatch<const T extends readonly unknown[]>(
   statements: T,
   input: AuditInput,
 ): Promise<{ [K in keyof T]: StatementResult<T[K]> }> {
-  // The production source record requires domain writes and the audit record
-  // to execute in one D1 batch. The guard expression is retained in the
-  // transaction contract so stale-write protection remains explicit.
-  const guardContract = input.guard
-    ? sql`select case when ${input.guard} then 1 else 0 end`
-    : sql`select 1`;
-  void guardContract;
-  const auditStatement = await preparedAudit(db, actor, request, input);
-  return (db as unknown as { batch(items: unknown[]): Promise<unknown[]> })
-    .batch([...statements, auditStatement])
-    .then((rows) => rows.slice(0, statements.length)) as Promise<{
+  const { statement: auditStatement } = await preparedAudit(db, actor, request, input);
+  try {
+    const rows = await (db as unknown as { batch(items: unknown[]): Promise<unknown[]> })
+      .batch([...statements, auditStatement]);
+    return rows.slice(0, statements.length) as {
       [K in keyof T]: StatementResult<T[K]>;
-    }>;
+    };
+  } catch (error) {
+    // Drizzle or D1 may wrap the constraint error in a cause. Translate only
+    // the deliberate guard failure, leaving other database errors untouched.
+    let cause: unknown = error;
+    for (let depth = 0; cause instanceof Error && depth < 5; depth += 1) {
+      if (input.guard && /NOT NULL constraint failed:\s*audit_events\.organization_id/i.test(cause.message)) {
+        throw new Error("Record changed; refresh and try again", { cause: error });
+      }
+      cause = cause.cause;
+    }
+    throw error;
+  }
 }
 
 export async function verifyAuditChain(db: Db, organizationId: string) {

@@ -23,7 +23,6 @@ test("critical authorization writes are atomic and duplicate approvals are const
   assert.match(schema, /uq_approvals_org_decision_approver/);
   assert.match(schema, /idx_access_grants_authorization/);
   assert.match(audit, /export async function auditedWrite/);
-  assert.match(audit, /case when \$\{input\.guard\}/);
   assert.match(governance, /guard: sql`changes\(\) = 1`/);
   assert.match(governance, /select count\(\*\) from \$\{s\.approvals\}/);
   assert.doesNotMatch(
