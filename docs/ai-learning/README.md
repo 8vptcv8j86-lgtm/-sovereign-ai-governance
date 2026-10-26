@@ -6,9 +6,10 @@ This folder turns the referenced AI courses into a practical program for buildin
 
 1. Follow [LEARNING_PLAN.md](./LEARNING_PLAN.md).
 2. Build the exercises in [PROJECT_LABS.md](./PROJECT_LABS.md).
-3. Use [UI_DESIGN_TOOLKIT.md](./UI_DESIGN_TOOLKIT.md) for interface design and review.
-4. Record results in [PROGRESS_LOG.md](./PROGRESS_LOG.md).
-5. Before any AI feature is released, complete:
+3. Use [AI_DEVELOPMENT_TOOLKIT.md](./AI_DEVELOPMENT_TOOLKIT.md) for agents, RAG, web ingestion, and automation.
+4. Use [UI_DESIGN_TOOLKIT.md](./UI_DESIGN_TOOLKIT.md) for interface design and review.
+5. Record results in [PROGRESS_LOG.md](./PROGRESS_LOG.md).
+6. Before any AI feature is released, complete:
    - [AI_EVALUATION.md](./AI_EVALUATION.md)
    - [SECURITY_EVALUATION.md](./SECURITY_EVALUATION.md)
    - [GOVERNANCE_CHECKS.md](./GOVERNANCE_CHECKS.md)
@@ -27,6 +28,17 @@ This folder turns the referenced AI courses into a practical program for buildin
 | 8 | [AI for Beginners](https://github.com/microsoft/AI-For-Beginners) | Broader AI and machine learning foundations | Reference |
 | 9 | [Neural Networks: Zero to Hero](https://github.com/karpathy/nn-zero-to-hero) | Understand neural networks by implementing them | Later |
 | 10 | [LLMs from Scratch](https://github.com/rasbt/LLMs-from-scratch) | Understand transformer and LLM internals | Later |
+
+## Approved AI development toolkit
+
+- [n8n](https://github.com/n8n-io/n8n)
+- [Firecrawl](https://github.com/firecrawl/firecrawl)
+- [LangChain](https://github.com/langchain-ai/langchain)
+- [Anthropic Agent Skills](https://github.com/anthropics/skills)
+- [OpenAI Agents SDK for JavaScript](https://github.com/openai/openai-agents-js)
+- [Dify](https://github.com/langgenius/dify) — optional comparison prototype
+
+Use the adoption controls in [AI_DEVELOPMENT_TOOLKIT.md](./AI_DEVELOPMENT_TOOLKIT.md).
 
 ## Approved UI design toolkit
 
