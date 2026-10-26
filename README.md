@@ -106,3 +106,8 @@ The timeout defaults can be overridden for a controlled canary with `SITES_INSTA
 
 - [vinext Documentation](https://github.com/cloudflare/vinext)
 - [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+
+
+## Applied AI Learning and Assurance
+
+The [12 week applied AI learning program](./docs/ai-learning/README.md) connects the course library to Sentinel project labs, AI evaluation, security testing, governance gates, and progress tracking.
