@@ -6,8 +6,9 @@ This folder turns the referenced AI courses into a practical program for buildin
 
 1. Follow [LEARNING_PLAN.md](./LEARNING_PLAN.md).
 2. Build the exercises in [PROJECT_LABS.md](./PROJECT_LABS.md).
-3. Record results in [PROGRESS_LOG.md](./PROGRESS_LOG.md).
-4. Before any AI feature is released, complete:
+3. Use [UI_DESIGN_TOOLKIT.md](./UI_DESIGN_TOOLKIT.md) for interface design and review.
+4. Record results in [PROGRESS_LOG.md](./PROGRESS_LOG.md).
+5. Before any AI feature is released, complete:
    - [AI_EVALUATION.md](./AI_EVALUATION.md)
    - [SECURITY_EVALUATION.md](./SECURITY_EVALUATION.md)
    - [GOVERNANCE_CHECKS.md](./GOVERNANCE_CHECKS.md)
@@ -26,6 +27,16 @@ This folder turns the referenced AI courses into a practical program for buildin
 | 8 | [AI for Beginners](https://github.com/microsoft/AI-For-Beginners) | Broader AI and machine learning foundations | Reference |
 | 9 | [Neural Networks: Zero to Hero](https://github.com/karpathy/nn-zero-to-hero) | Understand neural networks by implementing them | Later |
 | 10 | [LLMs from Scratch](https://github.com/rasbt/LLMs-from-scratch) | Understand transformer and LLM internals | Later |
+
+## Approved UI design toolkit
+
+- [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)
+- [Google DESIGN.md](https://github.com/google-labs-code/design.md)
+- [React Bits](https://github.com/DavidHDev/react-bits)
+- [GSAP](https://github.com/greensock/GSAP)
+- [Impeccable](https://github.com/pbakaus/impeccable)
+
+Use the sequence and release gates in [UI_DESIGN_TOOLKIT.md](./UI_DESIGN_TOOLKIT.md).
 
 ## Additional required references
 
