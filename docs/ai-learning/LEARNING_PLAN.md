@@ -24,6 +24,8 @@ Evidence:
 
 Course: LangChain RAG from Scratch.
 
+Toolkit references: Firecrawl for permitted web ingestion and LangChain for retrieval experiments.
+
 Build:
 - Week 3: ingest a small approved document set and return cited answers.
 - Week 4: test retrieval quality, missing evidence, conflicting sources, and malicious text inside a document.
@@ -40,6 +42,8 @@ Exit gate:
 ## Weeks 5 and 6: Agents
 
 Courses: Microsoft AI Agents for Beginners and Hugging Face Agents Course.
+
+Toolkit references: OpenAI Agents SDK for JavaScript for the current application stack and Anthropic Agent Skills for skill-structure comparison.
 
 Build:
 - Week 5: a read-only agent that selects between search, retrieval, and calculation tools.
@@ -99,6 +103,8 @@ Exit gate:
 ## Weeks 11 and 12: Production operations
 
 Courses: Made With ML and selected MLOps Zoomcamp modules.
+
+Toolkit reference: n8n for one approval-gated automation exercise. Dify may be used only for an optional browser-based comparison prototype.
 
 Build:
 - Monitoring for quality, security events, failures, cost, and latency.
