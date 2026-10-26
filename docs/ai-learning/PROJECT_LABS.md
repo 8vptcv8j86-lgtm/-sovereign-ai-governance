@@ -78,6 +78,8 @@ Required behavior:
 - Success metric and failure cost are stated.
 - Data sources and prohibited data are listed.
 - Ten or more representative tests exist.
+- A project-specific `DESIGN.md` exists and the UI Design Toolkit quality gates pass.
+- Mobile, tablet, desktop, keyboard, reduced-motion, and key interface states are verified.
 - Security, evaluation, and governance checklists are completed.
 - Human approval is required for consequential actions.
 - Results and remaining risks are committed to GitHub.
